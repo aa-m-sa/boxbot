@@ -1,0 +1,219 @@
+# -*- coding: utf-8 -*-
+
+""" 
+an IRC bot based on twisted matrix libraries
+
+updates channel topic promted by a RSS feed
+"""
+
+import logging
+
+#loggin setup
+logging.basicConfig(filename='gkctopicbot.log', level=logging.DEBUG,
+        format='%(asctime)s, %(name)s %(levelname)s %(message)s')
+log = logging.getLogger(__name__)
+
+from twisted.words.protocols import irc
+from twisted.internet import reactor, protocol, task
+
+# custom module
+import rssfeed
+
+# todo: features:
+# * a fully fledged command parser
+# * self-conciousness whether can / can't change topic and act accordingly
+#   when asked to change topic
+#
+# todo: refactoring / codebase improvement:
+# * proper error & exception handling for stability / hardness
+# * separate bot (which takes commands and processes them) and protocol/client ?
+#   ...e.g. copy pyfibot and subclass Bot from BotCore/IrcProtocol
+
+class Bot(irc.IRCClient):
+    """A protocol object (our 'bot') for IRC'ing"""
+
+    nickname = "boxbot"
+    realname = "a gkctopicbot"
+
+    hasQuit = False
+
+    def connectionMade(self):
+        irc.IRCClient.connectionMade(self)
+        log.info("connection made. starting heartbeat")
+        self.startHeartbeat()
+
+    def connectionLost(self, reason):
+        irc.IRCClient.connectionLost(self, reason)
+        log.info("connection lost: %s", reason)
+
+    def signedOn(self):
+        """Called when bot has successfully connected to a server."""
+        log.info("signed on. bot joining the channel...")
+        # join the channel
+        self.join(self.factory.channel)
+    
+    def joined(self, channel):
+        log.info("successfully joined the channel: %s", channel)
+        self.cachedOp = False
+
+    #TO BE TESTED
+    def modeChanged(self, user, channel, setted, modes, args):
+        log.debug("noticed mode change: %s, %s, %s, %s, %s" 
+                % (user, channel, setted, modes, args))
+        if channel == self.factory.channel and self.nickname in args:
+            log.info("bot mode changed by %s. set: %s modes: %s" 
+                    % (user, str(setted), modes))
+            if 'o' in modes:
+                self.cachedOp = setted
+
+    def topicUpdated(self, user, channel, newTopic): 
+        """In channel, user changed the topic to newTopic.
+
+        Also called when first joining a channel."""
+        
+        log.info("%s topic updated by %s: %s" % (channel, user, newTopic))
+        self.cachedTopic = newTopic
+        # joined the channel and got a topic: start monitoring the feed
+        if not self.factory.feedMonitor.isRunning:
+            log.info("starting feed monitor...")
+            self.factory.feedMonitor.start()
+
+    def privmsg(self, user, channel, msg):
+        """This will get called when the bot receives a message"""
+        log.info("bot received a message: %s: %s: %s" % (channel, user, msg))
+
+        # A QUICK HACK:
+        # proper command parser to be implemented
+        if msg == self.nickname +  ", quit":
+            log.info("bot received a quitting command")
+            self.quit("Awww.")
+        elif msg == self.nickname + ", update feed":
+            log.info("bot received an update command. calling rssCheck()...")
+            self.factory.feedMonitor.rssCheck()
+<<<<<<< HEAD
+=======
+        elif msg == self.nickname + ", set topic":
+            log.info("bot received a command to start setting topic")
+            self.factory.feedMonitor.updatesTitle = True
+            self.factory.feedMonitor.rssCheck()
+        elif msg == self.nickname + ", don't set topic":
+            log.info("bot received a command to start setting topic")
+            self.factory.feedMonitor.updatesTitle = False
+        elif msg == self.nickname + ", introduce yourself":
+            log.info("bot received an introduce command. proceeding...")
+            self.announce("HELLOOO")
+        elif msg.startswith(self.nickname):
+            log.info("bot called, responding with aww")
+            self.announce("Awww.")
+>>>>>>> refinements
+
+    # commands that monitor should use
+
+    def quit(self, msg):
+        """Disconnect from network"""
+        self.hasQuit = True
+        log.info("bot quitting (with message %s). stopping heartbeat...", msg)
+        self.stopHeartbeat()
+        log.info("stopping feedmonitor...")
+        self.feedMonitor.stop()
+        irc.IRCClient.quit(self, msg)
+
+    def announce(self, msg):
+        """Announce a message to channel"""
+        self.say(self.factory.channel, str(msg))
+        log.info("bot announced: %s", msg) 
+
+    def announceWant(self, topic):
+        self.announce("wants to set topic to: " + topic)
+
+    def setTopic(self, topic):
+        """Set the channel topic"""
+        # check if opp'd, then set, otherwise, complain
+        log.info("bot asked to set topic")
+        if self.cachedOp:
+            log.info("bot setting topic to: %s", topic)
+            self.topic(self.factory.channel, str(topic))
+        else:
+            log.info("bot thinks it's not able to set topic")
+            self.announceWant(topic)
+
+    def getTopic(self):
+        """Get the channel topic"""
+        return self.cachedTopic
+
+
+class BotFactory(protocol.ReconnectingClientFactory):
+    """A factory for Bots"""
+    
+    def __init__(self, channel, rssConfig):
+        """Initializing the factory"""
+        self.channel = channel
+        self.rssConfig = rssConfig
+        # pass the config to feed monitor
+        log.debug("bot factory initilized")
+
+    def startFactory(self):
+        """This will be called before I begin listening on a Port or Connector."""
+        log.debug("factory starting")
+        pass
+
+    def stopFactory(self):
+        """
+        Called before stopping listening on all Ports/Connectors. 
+        """
+        log.debug("factory stopping")
+
+    def buildProtocol(self, addr):
+        """Create an instance of a subclass of Protocol."""
+        log.debug("build protocol called: building bot.")
+        # successfully connected, create the bot
+        p = Bot()
+        self.bot = p
+        p.factory = self
+        # start monitoring the feed with a Monitor;
+        # provide it with a bot to manipulate
+        log.debug("creating a feed monitor with a bot...")
+        self.feedMonitor = rssfeed.Monitor(self.rssConfig, p)
+        # reset reconnection delay
+        self.resetDelay()
+        return p
+
+    def clientConnectionLost(self, connector, reason):
+        """Connection lost, if not quitting, reconnect."""
+        log.info("connection lost (%s)" % reason)
+        if self.bot.hasQuit: 
+            log.info("quitting: stopping reactor")
+            reactor.stop()
+        else:
+            log.info("reconnect via parent...")
+            protocol.ReconnectingClientFactory.clientConnectionLost(self, 
+                    connector, reason)
+
+    def clientConnectionFailed(self, connector, reason):
+        log.info("connection failed (%s), should reconnect..." % reason)
+        protocol.ReconnectingClientFactory.clientConnectionFailed(self,
+                connector, reason)
+
+def main():
+    log.info("-"*10)
+    log.info("entered main")
+
+    # todo: read this from config file? (low importance)
+    host = "dreamhack.se.quakenet.org"
+    port = 6667
+    channel = "#robox"
+    log.debug("got config for irc: connection details: %s:%d, channel %s" 
+            % (host, port, channel))
+
+    rssUrl = "http://gunnerkrigg.proboards.com/rss/public"
+    rssFreq = 200
+    log.debug("got config for rss: %s, delay %d sec" % (rssUrl, rssFreq))
+
+    factory = BotFactory(channel, (rssUrl, rssFreq))
+
+    log.info("connecting to %s:%d" % (host, port))
+    reactor.connectTCP(host, port, factory)
+    reactor.run()
+
+if __name__ == "__main__":
+    main()

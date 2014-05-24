@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python gkctopicbot/gkctopicbot.py config.yaml --log debug

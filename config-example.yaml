@@ -1,0 +1,17 @@
+network:
+        host:   your.server.org
+        port:   6667
+
+channel:  "#channel"
+     
+rss:
+        url:    "http://your.rss.feed/url"
+        freq:   60
+
+quakeAuth:
+        authName:   quakeNetAuthName        
+        authPass:   quakeNetAuthPassword
+
+nickname:  "yournick"               
+realname:  "yourname"
+build:     "unstable dev build"
