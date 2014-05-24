@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python boxbot/boxbot.py config.yaml
