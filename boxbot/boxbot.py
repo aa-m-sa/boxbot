@@ -115,6 +115,10 @@ class Bot(irc.IRCClient):
         def parseBotCmd(cmd):
             return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
 
+        title = urltitle.parseurl(msg)
+        if title:
+            self.announce(title)
+
         # A QUICK HACK:
         # proper command parser to be implemented
         if parseBotCmd("quit"):
