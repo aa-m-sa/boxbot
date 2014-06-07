@@ -119,7 +119,7 @@ class Bot(irc.IRCClient):
         def titleAnnounce(title):
             if title:
                 log.info("channel patron posted an url, announcing title")
-                self.announce(title)
+                self.announce("Title: " + title)
 
         log.debug("bot to determine if privmsg an url")
         url = urltitle.parseUrl(msg)
