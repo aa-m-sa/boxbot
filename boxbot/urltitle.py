@@ -40,8 +40,8 @@ def fetchTitle(url):
         # requests threw an exception
         log.error("requests produced exception %s", e)
         d.errback(e)
-        
-    soup = BeautifulSoup(r.text)
-    d.callback(soup.title.string)
+    else: 
+        soup = BeautifulSoup(r.text)
+        d.callback(soup.title.string)
 
     return d
