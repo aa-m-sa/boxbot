@@ -115,8 +115,10 @@ class Bot(irc.IRCClient):
         def parseBotCmd(cmd):
             return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
 
+        log.debug("bot determining if privmsg an url")
         title = urltitle.parseurl(msg)
         if title:
+            log.info("channel patron posted an url, announcing title")
             self.announce(title)
 
         # A QUICK HACK:
