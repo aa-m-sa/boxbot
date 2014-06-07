@@ -33,7 +33,12 @@ def fetchTitle(url):
     """
     d = defer.Deferred()
 
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except Exception as e:
+        # requests threw an exception
+        d.errback(e)
+        
     soup = BeautifulSoup(r.text)
     d.callback(soup.title.string)
 

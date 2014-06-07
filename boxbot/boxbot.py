@@ -125,6 +125,7 @@ class Bot(irc.IRCClient):
         url = urltitle.parseUrl(msg)
         d = urltitle.fetchTitle(url)
         d.addCallback(titleAnnounce)
+        d.addErrback(lambda e: log.error("couldn't fetch title, %s", e))
 
         # A QUICK HACK:
         # proper command parser to be implemented
