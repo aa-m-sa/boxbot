@@ -29,8 +29,8 @@ def parseUrl(msg):
             return ""
         msg = "http://" + msg[www.start()]
         urlIndex = 0
-
-    urlIndex = url.start()
+    else:
+        urlIndex = url.start()
 
     msgParts = msg[urlIndex:].split()
     return msgParts[0]
