@@ -122,8 +122,9 @@ class Bot(irc.IRCClient):
                 self.announce(title)
 
         log.debug("bot to determine if privmsg an url")
-        title = urltitle.parseurl(msg)
-        title.addCallback(titleAnnounce)
+        url = urltitle.parseUrl(msg)
+        d = urltitle.fetchTitle(url)
+        d.addCallback(titleAnnounce)
 
         # A QUICK HACK:
         # proper command parser to be implemented
