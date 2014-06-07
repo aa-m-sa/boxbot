@@ -57,7 +57,7 @@ def fetchTitle(url):
             titlestring = "Title: " + soup.title.string
         else:
             titlestring = "content-type: "+ r.headers['content-type'] + 
-            ", size " + sizeOf(r.headers['content-length'])
+                ", size " + sizeOf(r.headers['content-length'])
     except Exception as e:
         # thrown an exception
         log.error("fetchTitle produced exception: %s", e)
