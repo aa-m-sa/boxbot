@@ -50,17 +50,19 @@ def fetchTitle(url):
     d = defer.Deferred()
 
     try:
-        r = requests.get(url, timeout = 1.0)
+        r = requests.head(url, timeout = 1.0)
+        if 'text/html' in r.headers['content-type']:
+            rd = requests.get(url)
+            soup = BeautifulSoup(rd.text)
+            titlestring = "Title: " + soup.title.string
+        else:
+            titlestring = "content-type: "+ r.headers['content-type'] + 
+            ", size " + sizeOf(r.headers['content-length'])
     except Exception as e:
-        # requests threw an exception
-        log.error("requests produced exception %s", e)
+        # thrown an exception
+        log.error("fetchTitle produced exception: %s", e)
         d.errback(e)
     else: 
-        if 'text/html' in r.headers['content-type']:
-            soup = BeautifulSoup(r.text)
-            d.callback("Title: " + soup.title.string)
-        else:
-            d.callback("content-type: "+ r.headers['content-type'] + ", size "
-                    + sizeOf(r.headers['content-length']))
+        d.callback(titlestring)
 
     return d
