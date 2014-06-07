@@ -6,6 +6,7 @@ able to
 * Change an irc channel topic prompted by a (proboards forum) RSS feed.
 * Notify irc channel patrons about new forum posts (again, via RSS feed).
 * Get authed with QuakeNet Q
+* Parse url titles (with Requests and BeautifulSoup)
 * Provide simple entertainment (Hellooo! Awww.) to channel patrons
 
 ## usage ##
