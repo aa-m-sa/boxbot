@@ -56,7 +56,7 @@ def fetchTitle(url):
         log.error("requests produced exception %s", e)
         d.errback(e)
     else: 
-        if r.headers['content-type'] == 'text/html':
+        if 'text/html' in r.headers['content-type']:
             soup = BeautifulSoup(r.text)
             d.callback("Title: " + soup.title.string)
         else:
