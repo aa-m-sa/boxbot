@@ -53,7 +53,7 @@ def fetchTitle(url):
             soup = BeautifulSoup(r.text)
             d.callback("Title: " + soup.title.string)
         else:
-            d.callback(r.headers['content-type'] + 
-                    str(r.headers['content-length']))
+            d.callback("content-type: "+ r.headers['content-type'] + ", size "
+                    + str(r.headers['content-length']))
 
     return d
