@@ -19,6 +19,8 @@ def parseUrl(msg):
     
     if urlIndex == -1:
         wwwIndex = msg.find('www')
+        if wwwIndex == -1:
+            return ""
         msg = "http://" + msg[wwwIndex:]
         urlIndex = 0
 
