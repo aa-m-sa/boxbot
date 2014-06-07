@@ -17,6 +17,13 @@ urlPat = re.compile(urlRe)
 wwwRe = r'www([.].+){2}'
 wwwPat = re.compile(wwwRe)
 
+def sizeOf(contLength):
+    num = int(contLength)
+    for d in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%.1f %s" % (num, d)
+        num /= 1024.0
+
 def parseUrl(msg):
     """
     See if maybeUrl is an url.
@@ -49,7 +56,11 @@ def fetchTitle(url):
         log.error("requests produced exception %s", e)
         d.errback(e)
     else: 
-        soup = BeautifulSoup(r.text)
-        d.callback(soup.title.string)
+        if r.headers['content-type'] == 'text/html':
+            soup = BeautifulSoup(r.text)
+            d.callback("Title: " + soup.title.string)
+        else:
+            d.callback("content-type: "+ r.headers['content-type'] + ", size "
+                    + sizeOf(r.headers['content-length']))
 
     return d
