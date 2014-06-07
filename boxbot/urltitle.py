@@ -20,7 +20,7 @@ def parseUrl(msg):
     
     if urlIndex == -1:
         wwwIndex = msg.find('www')
-        msg = "http://" + [wwwIndex:]
+        msg = "http://" + msg[wwwIndex:]
         urlIndex = 0
 
     msgParts = msg[urlIndex:].split()
