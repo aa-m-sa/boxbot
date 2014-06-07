@@ -19,8 +19,9 @@ import sys
 import argparse
 import yaml
 
-# custom module
+# custom modules
 import rssfeed
+import urltitle
 
 # todo: features:
 # * a fully fledged command parser
