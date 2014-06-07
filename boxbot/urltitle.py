@@ -34,7 +34,7 @@ def fetchTitle(url):
     d = defer.Deferred()
 
     try:
-        r = requests.get(url)
+        r = requests.get(url, timeout = 1.0)
     except Exception as e:
         # requests threw an exception
         d.errback(e)
