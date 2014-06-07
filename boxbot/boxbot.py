@@ -13,14 +13,15 @@ import logging
 log = logging.getLogger(__name__)
 
 from twisted.words.protocols import irc
-from twisted.internet import reactor, protocol, task
+from twisted.internet import reactor, protocol, task, defer
 
 import sys
 import argparse
 import yaml
 
-# custom module
+# custom modules
 import rssfeed
+import urltitle
 
 # todo: features:
 # * a fully fledged command parser
@@ -114,6 +115,17 @@ class Bot(irc.IRCClient):
 
         def parseBotCmd(cmd):
             return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
+
+        def titleAnnounce(title):
+            log.info("channel patron posted an url, announcing title")
+            self.announce("Title: " + title)
+
+        log.debug("bot to determine if privmsg an url")
+        url = urltitle.parseUrl(msg)
+        if url:
+            d = urltitle.fetchTitle(url)
+            d.addCallback(titleAnnounce)
+            d.addErrback(lambda e: log.error("couldn't fetch title, %s", e))
 
         # A QUICK HACK:
         # proper command parser to be implemented
