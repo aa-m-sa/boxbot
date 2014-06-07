@@ -37,6 +37,7 @@ def fetchTitle(url):
         r = requests.get(url, timeout = 1.0)
     except Exception as e:
         # requests threw an exception
+        log.error("requests produced exception %s", e)
         d.errback(e)
         
     soup = BeautifulSoup(r.text)
