@@ -10,6 +10,10 @@ log = logging.getLogger(__name__)
 from twisted.internet import reactor, defer
 from  bs4 import BeautifulSoup
 import requests
+import re
+
+wwwRe = r'www([.].+){2}'
+wwwPat = re.compile(wwwRe)
 
 def parseUrl(msg):
     """
@@ -19,7 +23,7 @@ def parseUrl(msg):
     
     if urlIndex == -1:
         wwwIndex = msg.find('www')
-        if wwwIndex == -1:
+        if wwwIndex == -1 or not wwwPat.match(msg[wwwIndex:]):
             return ""
         msg = "http://" + msg[wwwIndex:]
         urlIndex = 0
