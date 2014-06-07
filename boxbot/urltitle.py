@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from twisted.internet import reactor, defer
-from from bs4 import BeautifulSoup
+from  bs4 import BeautifulSoup
 import requests
 
 def parseUrl(msg):
