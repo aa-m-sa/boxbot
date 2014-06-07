@@ -117,15 +117,15 @@ class Bot(irc.IRCClient):
             return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
 
         def titleAnnounce(title):
-            if title:
-                log.info("channel patron posted an url, announcing title")
-                self.announce("Title: " + title)
+            log.info("channel patron posted an url, announcing title")
+            self.announce("Title: " + title)
 
         log.debug("bot to determine if privmsg an url")
         url = urltitle.parseUrl(msg)
-        d = urltitle.fetchTitle(url)
-        d.addCallback(titleAnnounce)
-        d.addErrback(lambda e: log.error("couldn't fetch title, %s", e))
+        if url:
+            d = urltitle.fetchTitle(url)
+            d.addCallback(titleAnnounce)
+            d.addErrback(lambda e: log.error("couldn't fetch title, %s", e))
 
         # A QUICK HACK:
         # proper command parser to be implemented
