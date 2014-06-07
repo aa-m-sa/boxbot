@@ -12,6 +12,8 @@ from  bs4 import BeautifulSoup
 import requests
 import re
 
+urlRe = r'http(s)?://'
+urlPat = re.compile(urlRe)
 wwwRe = r'www([.].+){2}'
 wwwPat = re.compile(wwwRe)
 
@@ -19,14 +21,16 @@ def parseUrl(msg):
     """
     See if maybeUrl is an url.
     """
-    urlIndex = msg.find('http://')
+    url = urlPat.search(msg)
     
-    if urlIndex == -1:
-        wwwIndex = msg.find('www')
-        if wwwIndex == -1 or not wwwPat.match(msg[wwwIndex:]):
+    if not url:
+        www = wwwPat.search(msg)
+        if not www:
             return ""
-        msg = "http://" + msg[wwwIndex:]
+        msg = "http://" + msg[www.start()]
         urlIndex = 0
+
+    urlIndex = url.start()
 
     msgParts = msg[urlIndex:].split()
     return msgParts[0]
