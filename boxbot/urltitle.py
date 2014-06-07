@@ -17,8 +17,8 @@ urlPat = re.compile(urlRe)
 wwwRe = r'www([.].+){2}'
 wwwPat = re.compile(wwwRe)
 
-def sizeOf(cont-length):
-    num = int(cont-length)
+def sizeOf(contLength):
+    num = int(contLength)
     for d in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if num < 1024.0:
             return "%.1f %s" % (num, d)
