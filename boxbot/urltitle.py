@@ -32,4 +32,9 @@ def fetchTitle(url):
     Returns a twisted deferred.
     """
     d = defer.Deferred()
+
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text)
+    d.callback(soup.title.string)
+
     return d
