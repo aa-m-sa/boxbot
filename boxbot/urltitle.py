@@ -15,7 +15,6 @@ def parseUrl(msg):
     """
     See if maybeUrl is an url.
     """
-    msg = unicode(msg, "utf-8") # ensure it's utf-8
     urlIndex = msg.find('http://')
     
     if urlIndex == -1:
