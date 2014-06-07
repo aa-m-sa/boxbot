@@ -27,7 +27,7 @@ def parseUrl(msg):
         www = wwwPat.search(msg)
         if not www:
             return ""
-        msg = "http://" + msg[www.start()]
+        msg = "http://" + msg[www.start():]
         urlIndex = 0
     else:
         urlIndex = url.start()
