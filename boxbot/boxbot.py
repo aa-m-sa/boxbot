@@ -113,6 +113,8 @@ class Bot(irc.IRCClient):
         """This will get called when the bot receives a message"""
         log.debug("bot received a message: %s: %s: %s" % (channel, user, msg))
 
+        msg = msg.decode('utf-8')
+
         def parseBotCmd(cmd):
             return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
 
@@ -187,7 +189,7 @@ class Bot(irc.IRCClient):
     def announce(self, msg):
         """Announce a message to channel"""
         if self.announceAllowed:
-            self.say(self.factory.channel, str(msg))
+            self.say(self.factory.channel, msg.encode('utf-8'))
             log.info("bot announced: %s", msg) 
         else:
             log.info("announce called but bot is silenced")
@@ -206,7 +208,7 @@ class Bot(irc.IRCClient):
         log.info("bot asked to set topic")
         if self.cachedOp:
             log.info("bot setting topic to: %s", topic)
-            self.topic(self.factory.channel, str(topic))
+            self.topic(self.factory.channel, msg.encode('utf-8'))
         else:
             log.info("bot thinks it's not able to set topic")
             self.announceWant(topic)
