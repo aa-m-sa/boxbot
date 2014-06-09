@@ -208,7 +208,7 @@ class Bot(irc.IRCClient):
         log.info("bot asked to set topic")
         if self.cachedOp:
             log.info("bot setting topic to: %s", topic)
-            self.topic(self.factory.channel, msg.encode('utf-8'))
+            self.topic(self.factory.channel, topic.encode('utf-8'))
         else:
             log.info("bot thinks it's not able to set topic")
             self.announceWant(topic)
