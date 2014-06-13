@@ -109,14 +109,7 @@ class Bot(irc.IRCClient):
             log.info("starting feed monitor...")
             self.factory.feedMonitor.start()
 
-    def privmsg(self, user, channel, msg):
-        """This will get called when the bot receives a message"""
-        log.debug("bot received a message: %s: %s: %s" % (channel, user, msg))
-
-        msg = msg.decode('utf-8')
-
-        def parseBotCmd(cmd):
-            return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
+    def urlfetcher(self, msg):
 
         def titleAnnounce(titletext):
             log.info("channel patron posted an url, announcing title")
@@ -129,6 +122,16 @@ class Bot(irc.IRCClient):
             d.addCallback(titleAnnounce)
             d.addErrback(lambda e: log.error("couldn't fetch title, %s", e))
 
+    def privmsg(self, user, channel, msg):
+        """This will get called when the bot receives a message"""
+        log.debug("bot received a message: %s: %s: %s" % (channel, user, msg))
+
+        msg = msg.decode('utf-8')
+
+        self.urlfetcher(msg)
+
+        def parseBotCmd(cmd):
+            return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
         # A QUICK HACK:
         # proper command parser to be implemented
         if parseBotCmd("quit"):
@@ -160,6 +163,10 @@ class Bot(irc.IRCClient):
             self.announceAww()
 
     def action(self, user, channel, data):
+        msg = msg.decode('utf-8')
+
+        self.urlfetcher(msg)
+
         if channel == self.factory.channel and self.nickname in data:
             if "fish" in data or "trout" in data or "large" in data:
                 if "slaps" in data:
