@@ -318,7 +318,7 @@ if __name__ == "__main__":
 
     #loggin setup
     numericLevel = getattr(logging, args.log.upper(), None)
-    logging.basicConfig(filename='gkctopicbot.log', level=numericLevel,
+    logging.basicConfig(filename='boxbot.log', level=numericLevel,
             format='%(asctime)s, %(name)s %(levelname)s %(message)s')
 
     main(args)
