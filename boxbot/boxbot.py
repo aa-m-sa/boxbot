@@ -163,9 +163,9 @@ class Bot(irc.IRCClient):
             self.announceAww()
 
     def action(self, user, channel, data):
-        msg = msg.decode('utf-8')
+        data = data.decode('utf-8')
 
-        self.urlfetcher(msg)
+        self.urlfetcher(data)
 
         if channel == self.factory.channel and self.nickname in data:
             if "fish" in data or "trout" in data or "large" in data:
