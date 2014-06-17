@@ -45,14 +45,16 @@ def parseUrl(msg):
 def fetchTitle(url):
     """
     fetches the title of the document behind the url
-    a blocking function; to be in run in a thread.
+    because request library functions are blocking, this is for the sake of 
+    simplity implemented as a blocking function too; 
+    to be in run in a thread.
     """
     try:
         r = requests.head(url, timeout = 5.0)
         if 'text/html' in r.headers['content-type']:
             rd = requests.get(url)
             soup = BeautifulSoup(rd.text)
-             return "Title: " + soup.title.string.strip()
+            return "Title: " + soup.title.string.strip()
         else:
             return "content-type: "+ r.headers['content-type'] + ", size " + sizeOf(r.headers['content-length'])
     except Exception as e:
