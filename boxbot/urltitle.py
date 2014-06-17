@@ -45,23 +45,17 @@ def parseUrl(msg):
 def fetchTitle(url):
     """
     fetches the title of the document behind the url
-    Returns a twisted deferred.
+    a blocking function; to be in run in a thread.
     """
-    d = defer.Deferred()
-
     try:
-        r = requests.head(url, timeout = 1.0)
+        r = requests.head(url, timeout = 5.0)
         if 'text/html' in r.headers['content-type']:
             rd = requests.get(url)
             soup = BeautifulSoup(rd.text)
-            titlestring = "Title: " + soup.title.string.strip()
+             return "Title: " + soup.title.string.strip()
         else:
-            titlestring = "content-type: "+ r.headers['content-type'] + ", size " + sizeOf(r.headers['content-length'])
+            return "content-type: "+ r.headers['content-type'] + ", size " + sizeOf(r.headers['content-length'])
     except Exception as e:
         # thrown an exception
         log.error("fetchTitle produced exception: %s", e)
-        d.errback(e)
-    else: 
-        d.callback(titlestring)
-
-    return d
+        raise

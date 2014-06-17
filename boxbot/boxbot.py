@@ -13,7 +13,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from twisted.words.protocols import irc
-from twisted.internet import reactor, protocol, task, defer
+from twisted.internet import reactor, protocol, task, defer, threads
 
 import sys
 import argparse
@@ -118,7 +118,7 @@ class Bot(irc.IRCClient):
         log.debug("bot to determine if privmsg an url")
         url = urltitle.parseUrl(msg)
         if url:
-            d = urltitle.fetchTitle(url)
+            d = threads.deferToThread(urltitle.fetchTitle, url)
             d.addCallback(titleAnnounce)
             d.addErrback(lambda e: log.error("couldn't fetch title, %s", e))
 
