@@ -196,7 +196,7 @@ class Bot(irc.IRCClient):
 
     def colorFormat(self, msg):
         """put some nice colors on the message"""
-        return irc.assembleFormattedText(irc.attributes.fg.grey[msg])
+        return irc.assembleFormattedText(irc.attributes.fg.gray[msg])
 
     def announce(self, msg):
         """Announce a message to channel"""
