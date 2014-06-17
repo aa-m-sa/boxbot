@@ -47,6 +47,7 @@ class Bot(irc.IRCClient):
     # "AI"
     awws = 0
     maxAwws = 3
+    cachedTopic = None
 
     def __init__(self, factory):
         self.factory = factory
