@@ -15,8 +15,8 @@ This bot being heavily in development, you probably do not want to actually
 use this for anything.
 
 However, if you insist:
-Create a 'config.yaml' file, see 'config-example.yaml' for syntax.
-Run by executing the script 'bin/boxbot'.
+Create a 'config.yaml' and 'config-test.yaml' files, see 
+'config-example.yaml' for syntax. Run by executing the script 'bin/boxbot'.
 
 ## license ##
 
