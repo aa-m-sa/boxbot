@@ -54,7 +54,7 @@ def fetchTitle(url):
         if 'text/html' in r.headers['content-type']:
             rd = requests.get(url)
             soup = BeautifulSoup(rd.text)
-            titlestring = "Title: " + soup.title.string
+            titlestring = "Title: " + soup.title.string.strip()
         else:
             titlestring = "content-type: "+ r.headers['content-type'] + ", size " + sizeOf(r.headers['content-length'])
     except Exception as e:
