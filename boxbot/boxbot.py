@@ -81,6 +81,9 @@ class Bot(irc.IRCClient):
     def joined(self, channel):
         log.info("successfully joined the channel: %s", channel)
         self.cachedOp = False
+        if not self.factory.feedMonitor.isRunning:
+            log.info("starting feed monitor...")
+            self.factory.feedMonitor.start()
 
     def modeChanged(self, user, channel, setted, modes, args):
         log.debug("noticed mode change: %s, %s, %s, %s, %s" 
@@ -105,9 +108,6 @@ class Bot(irc.IRCClient):
         log.info("%s topic updated by %s: %s" % (channel, user, newTopic))
         self.cachedTopic = newTopic
         # joined the channel and got a topic: start monitoring the feed
-        if not self.factory.feedMonitor.isRunning:
-            log.info("starting feed monitor...")
-            self.factory.feedMonitor.start()
 
     def urlfetcher(self, msg):
 
@@ -226,7 +226,10 @@ class Bot(irc.IRCClient):
 
     def getTopic(self):
         """Get the channel topic"""
-        return self.cachedTopic
+        if self.cachedTopic:
+            return self.cachedTopic
+        else:
+            return ""
 
 
 class BotFactory(protocol.ReconnectingClientFactory):
