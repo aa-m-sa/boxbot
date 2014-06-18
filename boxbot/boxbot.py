@@ -196,12 +196,12 @@ class Bot(irc.IRCClient):
 
     def colorFormat(self, msg):
         """put some nice colors on the message"""
-        return irc.assembleFormattedText(irc.attributes.fg.gray[msg])
+        return irc.assembleFormattedText(irc.attributes.normal[irc.attributes.fg.gray[msg]])
 
     def announce(self, msg):
         """Announce a message to channel"""
         if self.announceAllowed:
-            self.say(self.factory.channel, self.colorFormat(msg).encode('utf-8'))
+            self.say(self.factory.channel, self.colorFormat(msg.encode('utf-8')))
             log.info("bot announced: %s", msg) 
         else:
             log.info("announce called but bot is silenced")
