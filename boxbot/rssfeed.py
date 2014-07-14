@@ -232,7 +232,7 @@ class Monitor:
 
         log.debug("announcing threads with new posts")
         for t in updatedThreads:
-            self.bot.announce(str(t.postby) + " posted to '" + str(t.title) + "' " + str(t.recentlink))
+            self.bot.announce(t.postby + " posted to '" + t.title + "' " + t.recentlink)
 
 
     def _ircTopicUpdate(self, feedTopic):
