@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" 
+"""
 an IRC bot based on twisted matrix libraries
 
 updates channel topic prompted by a RSS feed
@@ -38,7 +38,7 @@ class Bot(irc.IRCClient):
     lineRate = 1
     maxWAnnounce = 4
     doneWAnnounce = 0
-    
+
     willAuth = True
 
     hasQuit = False
@@ -73,12 +73,12 @@ class Bot(irc.IRCClient):
             log.info("we're on quakenet and authenticating...")
             self.mode(self.nickname, True, "x")     # set user mode +x
             # authname, authpass should be got in a more sensible way
-            self.msg("Q@CServe.quakenet.org", "AUTH %s %s" % 
+            self.msg("Q@CServe.quakenet.org", "AUTH %s %s" %
                     (self.factory.quakeConfig['authName'], self.factory.quakeConfig['authPass']))
 
         # join the channel
         self.join(self.factory.channel)
-    
+
     def joined(self, channel):
         log.info("successfully joined the channel: %s", channel)
         self.cachedOp = False
@@ -87,11 +87,11 @@ class Bot(irc.IRCClient):
             self.factory.feedMonitor.start()
 
     def modeChanged(self, user, channel, setted, modes, args):
-        log.debug("noticed mode change: %s, %s, %s, %s, %s" 
+        log.debug("noticed mode change: %s, %s, %s, %s, %s"
                 % (user, channel, setted, modes, args))
-        if channel == self.factory.channel: 
+        if channel == self.factory.channel:
             if self.nickname in args:
-                log.info("bot mode changed by %s. set: %s modes: %s" 
+                log.info("bot mode changed by %s. set: %s modes: %s"
                         % (user, str(setted), modes))
                 if 'o' in modes:
                     self.cachedOp = setted
@@ -101,11 +101,11 @@ class Bot(irc.IRCClient):
                 log.debug("resetting doneWAnnounce counter...")
                 self.doneWAnnounce = 0
 
-    def topicUpdated(self, user, channel, newTopic): 
+    def topicUpdated(self, user, channel, newTopic):
         """In channel, user changed the topic to newTopic.
 
         Also called when first joining a channel."""
-        
+
         log.info("%s topic updated by %s: %s" % (channel, user, newTopic))
         self.cachedTopic = newTopic
         # joined the channel and got a topic: start monitoring the feed
@@ -202,7 +202,7 @@ class Bot(irc.IRCClient):
         """Announce a message to channel"""
         if self.announceAllowed:
             self.say(self.factory.channel, self.colorFormat(msg.encode('utf-8')))
-            log.info("bot announced: %s", msg) 
+            log.info("bot announced: %s", msg)
         else:
             log.info("announce called but bot is silenced")
 
@@ -235,7 +235,7 @@ class Bot(irc.IRCClient):
 
 class BotFactory(protocol.ReconnectingClientFactory):
     """A factory for Bots"""
-    
+
     def __init__(self, config):
         """Initializing the factory"""
         self.config = config
@@ -271,12 +271,12 @@ class BotFactory(protocol.ReconnectingClientFactory):
     def clientConnectionLost(self, connector, reason):
         """Connection lost, if not quitting, reconnect."""
         log.info("connection lost (%s)" % reason)
-        if self.bot.hasQuit: 
+        if self.bot.hasQuit:
             log.info("quitting: stopping reactor")
             reactor.stop()
         else:
             log.info("reconnect via parent...")
-            protocol.ReconnectingClientFactory.clientConnectionLost(self, 
+            protocol.ReconnectingClientFactory.clientConnectionLost(self,
                     connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
@@ -301,7 +301,7 @@ def main(args):
     # reading from yaml config file
     try:
         config = readConfig(args.config)
-        # !!! config file is not validated! 
+        # !!! config file is not validated!
         # wrong syntax etc can cause problems
     except Exception as e:
         log.error("reading config file failed. terminating...")

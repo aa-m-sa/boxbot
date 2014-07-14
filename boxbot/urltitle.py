@@ -29,7 +29,7 @@ def parseUrl(msg):
     See if maybeUrl is an url.
     """
     url = urlPat.search(msg)
-    
+
     if not url:
         www = wwwPat.search(msg)
         if not www:
@@ -45,8 +45,8 @@ def parseUrl(msg):
 def fetchTitle(url):
     """
     fetches the title of the document behind the url
-    because request library functions are blocking, this is for the sake of 
-    simplity implemented as a blocking function too; 
+    because request library functions are blocking, this is for the sake of
+    simplity implemented as a blocking function too;
     to be in run in a thread.
     """
     try:

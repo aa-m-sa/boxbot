@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" 
+"""
 rssfeed module
 """
 
@@ -38,14 +38,14 @@ class TopicStatus:
 class Feed:
     """
     Represents the feed.
-    
+
     id: comic number id (in '[dddd] blahblah', dddd is the id)
     """
     threadEntries = {}
     titleRe = r'\[(\d{4})\](.*)'
     postbyRe = r'Last reply by (.+) on'
     linkRe = r'(\d+)'
-    mostRecentId = None 
+    mostRecentId = None
     recentComicEntry = None
     first = True
 
@@ -66,7 +66,7 @@ class Feed:
         self.first = False
         return self.topic, self.updatedThreads
 
-        # consider introducing more proper twisted style threading here? 
+        # consider introducing more proper twisted style threading here?
         # i.e. instead of deferToThread in Monitor.rssCheck, do it here, something like:
         # d = threads.deferToThread(feedparser.parse(self.url))
         # d.addCallback(handleParsedFeed)
@@ -120,7 +120,7 @@ class Feed:
             return entrya
         else:
             return entryb
-    
+
     def _parseComicTitle(self, entry):
         m = self.titlePat.match(entry.title)
         if m:
@@ -130,12 +130,12 @@ class Feed:
 
 class Monitor:
     """
-    Reads the RSS feed with a given frequency, 
+    Reads the RSS feed with a given frequency,
     commands the bot accordingly
     """
 
     topicRe = r'(.*)\[(\d{4})\](.*)'
-    
+
     bot = None
 
     def __init__(self, rssConfig, bot, updatesTitle = True):
@@ -144,12 +144,12 @@ class Monitor:
         self.isRunning = False
         self.bot = bot
         self.updatesTitle = updatesTitle
-        
+
         # precompile regex for topicparser
         self.topicPat = re.compile(self.topicRe)
 
         # is this a good way to do this?
-        # consider another options: 
+        # consider another options:
         # ...threading? ...proper delayed twisted deferrers? ...?
         # now it acts like it were a gigantic 'one' method, timewise(?)
         # now if rssCheck takes much time -> much blockin >.>
@@ -157,7 +157,7 @@ class Monitor:
         # we make rssCheck() a looping call
         self.loopcall = task.LoopingCall(self.rssCheck)
         log.debug("Monitor instance created")
-    
+
     def start(self):
         """Get the bot and start following the feed"""
         log.info("starting following a feed...")
@@ -176,7 +176,7 @@ class Monitor:
         log.debug("raw irc topic got form bot: %s", self._rawirctopic)
 
         # we might not be able to correctly parse raw irctopic if
-        # a user has set it into non-standard form 
+        # a user has set it into non-standard form
         try:
             a, d, t = self._parseIrcTopic()
             self._preamble = a
@@ -191,13 +191,13 @@ class Monitor:
             d, t = 0, ""
         log.debug("set preamble: %s", self._preamble)
         return TopicStatus(d, t)
-    
+
     def _parseIrcTopic(self):
         """
         Parse the 'raw' irc topic provided by the bot:
             return comicId, thread title text and copy the 'preamble'
         """
-        # assume irctopic is of the form: 
+        # assume irctopic is of the form:
         # "stuff - stuff blah bleh - [0000] Wow. a topic title
         log.debug("parsing raw irc topic: %s", self._rawirctopic)
         try:
