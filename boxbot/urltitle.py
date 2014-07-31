@@ -55,8 +55,10 @@ def fetchTitle(url):
             rd = requests.get(url)
             soup = BeautifulSoup(rd.text)
             return "Title: " + soup.title.string.strip()
-        else:
+        else if 'content-type' and 'content-length' in r.headers:
             return "content-type: "+ r.headers['content-type'] + ", size " + sizeOf(r.headers['content-length'])
+    	else:
+	    return "aww, what a strange link."
     except Exception as e:
         # thrown an exception
         log.error("fetchTitle produced exception: %s", e)
