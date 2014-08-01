@@ -135,33 +135,34 @@ class Bot(irc.IRCClient):
             return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
         # A QUICK HACK:
         # proper command parser to be implemented
-        if parseBotCmd("quit"):
-            log.info("bot received a quitting command")
-            self.quit("Awww.")
-        elif parseBotCmd("update feed"):
-            log.info("bot received an update command. calling rssCheck()...")
-            self.factory.feedMonitor.rssCheck()
-        elif parseBotCmd("set topic"):
-            log.info("bot received a command to start setting topic")
-            self.factory.feedMonitor.updatesTitle = True
-            self.factory.feedMonitor.rssCheck()
-        elif parseBotCmd("stop setting topic") or parseBotCmd("stop"):
-            log.info("bot received a command to start setting topic")
-            self.factory.feedMonitor.updatesTitle = False
-        elif parseBotCmd("silence"):
-            log.info("silencing bot")
-            self.announceAllowed = False
-        elif parseBotCmd("unsilence"):
-            log.info("unsilencing bot")
-            self.announceAllowed = True
-        elif parseBotCmd("introduce yourself") or parseBotCmd("help"):
-            log.info("bot received an introduce command. proceeding...")
-            self.announce("HELLOOO")
-            self.announce("boxbot" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
-            self.announce("currently available commands: 'quit', 'update feed', 'set topic', 'stop (setting topic)', 'silence', 'unsilence' ")
-            self.announce("contact maus if I'm too terrible and break something.")
-        elif self.nickname in msg:
-            self.announceAww()
+        if channel == self.factory.channel:
+            if parseBotCmd("quit"):
+                log.info("bot received a quitting command")
+                self.quit("Awww.")
+            elif parseBotCmd("update feed"):
+                log.info("bot received an update command. calling rssCheck()...")
+                self.factory.feedMonitor.rssCheck()
+            elif parseBotCmd("set topic"):
+                log.info("bot received a command to start setting topic")
+                self.factory.feedMonitor.updatesTitle = True
+                self.factory.feedMonitor.rssCheck()
+            elif parseBotCmd("stop setting topic") or parseBotCmd("stop"):
+                log.info("bot received a command to start setting topic")
+                self.factory.feedMonitor.updatesTitle = False
+            elif parseBotCmd("silence"):
+                log.info("silencing bot")
+                self.announceAllowed = False
+            elif parseBotCmd("unsilence"):
+                log.info("unsilencing bot")
+                self.announceAllowed = True
+            elif parseBotCmd("introduce yourself") or parseBotCmd("help"):
+                log.info("bot received an introduce command. proceeding...")
+                self.announce("HELLOOO")
+                self.announce("boxbot" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
+                self.announce("currently available commands: 'quit', 'update feed', 'set topic', 'stop (setting topic)', 'silence', 'unsilence' ")
+                self.announce("contact maus if I'm too terrible and break something.")
+            elif self.nickname in msg:
+                self.announceAww()
 
     def action(self, user, channel, data):
         data = data.decode('utf-8')
