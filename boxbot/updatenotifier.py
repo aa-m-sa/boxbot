@@ -33,10 +33,12 @@ class Notifier(object):
         log.debug("a notifier instance created")
 
     def parseSchedule(self, schedule):
-        return {k: datetime.time(int(l[0]), int(l[1])) for (k, l) in schedule}
+        return {k: datetime.time(int(schedule[k][0]), int(schedule[k][1])) 
+                for k in schedule}
 
     def parseConfig(self, notifyConfig):
-        comics = {comic: self.parseSchedule(sch) for (comic, sch) in notifyConfig['comics']}
+        comics = {comic: self.parseSchedule(notifyConfig['comics'][comic]) 
+                for comic in notifyConfig['comics']}
         return comics, notifyConfig['defaulComic'] 
 
     def parseMsg(self, msg):
