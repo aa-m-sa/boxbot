@@ -29,7 +29,7 @@ class Notifier(object):
     def __init__(self, notifyConfig, bot):
         """@todo: to be defined1. """
         self.bot = bot
-        self.comics, self.default_comic = parseConfig(notifyConfig)
+        self.comics, self.default_comic = self.parseConfig(notifyConfig)
         log.debug("a notifier instance created")
 
     def parseSchedule(self, schedule):

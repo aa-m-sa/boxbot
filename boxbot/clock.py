@@ -15,7 +15,7 @@ def findNextWeekDay(comic_schedule, currentUTCtime):
             cur_diff, cur = k - d, k
         elif k == 0 and 7 - d > 0 and 7 - d < cur_min:
             cur_diff, cur = 7 - d, k
-        elif k - d = 0:
+        elif k - d == 0:
             # the same day! clearly the min can't be less
             # but we should check if it's after or befor
             if currentUTCtime.time() < comic_schedule[k]:
