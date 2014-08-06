@@ -39,7 +39,7 @@ class Notifier(object):
     def parseConfig(self, notifyConfig):
         comics = {comic: self.parseSchedule(notifyConfig['comics'][comic]) 
                 for comic in notifyConfig['comics']}
-        return comics, notifyConfig['defaulComic'] 
+        return comics, notifyConfig['defaultComic'] 
 
     def parseMsg(self, msg):
         for k in comics.keys():
