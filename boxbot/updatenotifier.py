@@ -74,5 +74,6 @@ class Notifier(object):
             log.debug("comic_name successfully retrieved from msg")
             comic = cmd
         
+        log.info("Announcing time until the next update")
         self.bot.announce("Time until the next update in the comic " + cmd) 
         self.bot.announce(clock.timeUntilNextUpdate(self.comics[comic]))

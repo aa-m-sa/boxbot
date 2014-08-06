@@ -44,6 +44,7 @@ def prettify(timedelta):
     return output
 
 def timeUntilNextUpdate(comic_schedule):
+    log.info("calculator called")
     currentUTCtime = datetime.datetime.utcnow()
     day = findNextWeekDay(comic_schedule, currentUTCtime)
     return prettify(calculateDiff(currentUTCtime, day, comic_schedule))
