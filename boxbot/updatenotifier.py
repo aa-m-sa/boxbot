@@ -49,7 +49,7 @@ class Notifier(object):
             for i in idents:
                 # "next update" is the cmdstring to call Notifier
                 # get rid of this hardcoded value someday
-                if i in msg[len("next update "):]:
+                if i in msg[len(self.bot.nickname + "next update ") + 1:]:
                     return k
         log.debug("returning empty string")
         return ""
