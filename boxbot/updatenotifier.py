@@ -42,7 +42,7 @@ class Notifier(object):
         return comics, notifyConfig['defaultComic'] 
 
     def parseMsg(self, msg):
-        for k in comics.keys():
+        for k in self.comics.keys():
             idents = k.split()
             for i in idents:
                 # "next update" is the cmdstring to call Notifier
@@ -51,7 +51,7 @@ class Notifier(object):
                     return k
 
     def askedNextUpdateWith(self, msg):
-        d = thread.deferToThread(self.parseMsg(msg))
+        d = threads.deferToThread(self.parseMsg(msg))
         d.addCallback(handleCommand)
         d.addErrback(handleCommandError)
 
