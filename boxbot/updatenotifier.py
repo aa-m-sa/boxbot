@@ -32,8 +32,12 @@ class Notifier(object):
         self.comics, self.default_comic = parseConfig(notifyConfig)
         log.debug("a notifier instance created")
 
+    def parseSchedule(self, schedule):
+        return {k: datetime.time(int(l[0]), int(l[1])) for (k, l) in schedule}
+
     def parseConfig(self, notifyConfig):
-        return notifyConfig['comics'], notifyConfig['defaulComic'] 
+        comics = {comic: self.parseSchedule(sch) for (comic, sch) in notifyConfig['comics']}
+        return comics, notifyConfig['defaulComic'] 
 
     def parseMsg(self, msg):
         for k in comics.keys():
