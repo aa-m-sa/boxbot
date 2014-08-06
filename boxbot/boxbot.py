@@ -22,6 +22,7 @@ import yaml
 # custom modules
 import rssfeed
 import urltitle
+import updatenotifier
 
 # todo: features:
 # * a fully fledged command parser
@@ -159,8 +160,11 @@ class Bot(irc.IRCClient):
                 log.info("bot received an introduce command. proceeding...")
                 self.announce("HELLOOO")
                 self.announce("boxbot" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
-                self.announce("currently available commands: 'quit', 'update feed', 'set topic', 'stop (setting topic)', 'silence', 'unsilence' ")
+                self.announce("currently available commands: 'quit', 'update feed', 'set topic', 'stop (setting topic)', 'silence', 'unsilence', 'next update' ")
                 self.announce("contact maus if I'm too terrible and break something.")
+            elif parseBotCmd("next update"):
+                log.info("bot asked to retrieve time until the next comic update")
+                self.factory.comicNotifier.askedNextUpdateWith(msg)
             elif self.nickname in msg:
                 self.announceAww()
 
@@ -243,6 +247,7 @@ class BotFactory(protocol.ReconnectingClientFactory):
         self.channel = config['channel']
         self.rssConfig = config['rss']
         self.quakeConfig = config['quakeAuth']
+        self.notifyConfig = config['notifyComics']
         # pass the config to feed monitor
         log.debug("bot factory initilized")
 
@@ -265,6 +270,9 @@ class BotFactory(protocol.ReconnectingClientFactory):
         # provide it with a bot to manipulate
         log.debug("creating a feed monitor with a bot...")
         self.feedMonitor = rssfeed.Monitor(self.rssConfig, p)
+        # start the comic update notifier clock thingy, and provide it a bot too:
+        log.debug("creating a comic update time notifier")
+        self.comicNotifier = updatenotifier.Notifier(self.notifyConfig, p)
         # reset reconnection delay
         self.resetDelay()
         return p
@@ -313,7 +321,9 @@ def main(args):
     host, port = config['network']['host'], config['network']['port']
     log.debug("got config")
     log.debug("...connection details: %s:%d, channel %s" % (host, port, config['channel']))
-    log.debug("...rss details: %s, delay %d sec" % (config['rss']['url'], config['rss']['freq']))
+    log.debug("...rss details: %s, delay %d sec" 
+            % (config['rss']['url'], config['rss']['freq']))
+    log.debug("...comic-notify details: TODO")
 
     log.info("connecting to %s:%d" % (host, port))
     reactor.connectTCP(host, port, factory)

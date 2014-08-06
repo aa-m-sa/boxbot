@@ -15,3 +15,12 @@ quakeAuth:
 nickname:  "yournick"               
 realname:  "yourname"
 build:     "unstable dev build"
+
+notifyComics:
+        comics:
+            Gunnerkrigg Court : {
+                0: 0800,
+                2: 0800,
+                4: 0800
+                }
+        defaultComic: "Gunnerkrigg Court"
