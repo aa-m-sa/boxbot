@@ -8,19 +8,19 @@ a utility module for updatenotifier
 import datetime
 
 def findNextWeekDay(comic_schedule, currentUTCtime):
-    day = currentUTCtime.weekday()
+    d = currentUTCtime.weekday()
     cur_diff, cur = 7, None
     for k in comic_schedule.keys():
-        if k > 0 and k - d > 0 and k - d < cur_min:
+        if k > 0 and k - d > 0 and k - d < cur_diff:
             cur_diff, cur = k - d, k
-        elif k == 0 and 7 - d > 0 and 7 - d < cur_min:
+        elif k == 0 and 7 - d > 0 and 7 - d < cur_diff:
             cur_diff, cur = 7 - d, k
         elif k - d == 0:
             # the same day! clearly the min can't be less
             # but we should check if it's after or befor
             if currentUTCtime.time() < comic_schedule[k]:
                 return k
-        return cur
+    return cur
 
 def calculateDiff(currentUTCtime, next_day, schedule):
     day = currentUTCtime.weekday()
@@ -40,7 +40,7 @@ def prettify(timedelta):
     elif timedelta.days == 1:
         output += "1 day, "
     m = timedelta.seconds // 60
-    output += str(m) + " minutes, " + str(timedelta.seconds - m*60) + "seconds"
+    output += str(m) + " minutes, " + str(timedelta.seconds - m*60) + " seconds"
     return output
 
 def timeUntilNextUpdate(comic_schedule):

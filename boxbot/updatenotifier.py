@@ -42,25 +42,27 @@ class Notifier(object):
         return comics, notifyConfig['defaultComic'] 
 
     def parseMsg(self, msg):
+        log.debug("parsing msg %s" % msg)
         for k in self.comics.keys():
             idents = k.split()
+            log.debug("idents %s" %idents)
             for i in idents:
                 # "next update" is the cmdstring to call Notifier
                 # get rid of this hardcoded value someday
                 if i in msg[len("next update "):]:
                     return k
+        log.debug("returning empty string")
+        return ""
 
     def askedNextUpdateWith(self, msg):
-        d = threads.deferToThread(self.parseMsg(msg))
-        d.addCallback(handleCommand)
-        d.addErrback(handleCommandError)
+        self.handleCommand(self.parseMsg(msg))
 
     def handleCommandError(self, e):
-        log.info("Asked time until next update but couldn't parse comic name")
-        self.bot.announce("Aww, I couldn't parse that!")
-        return None
+        e.trap(Exception)
+        log.error("next update command parsing error: %s" % e)
     
     def handleCommand(self, cmd):
+        log.debug("handling cmd: %s" % cmd)
         if not cmd:
             log.info("comic name wasn't specified, assuming the default...")
             comic = self.default_comic
@@ -72,5 +74,5 @@ class Notifier(object):
             log.debug("comic_name successfully retrieved from msg")
             comic = cmd
         
-        d = threads.deferToThread(clock.timeUntilNextUpdate(comics[comic]))
-        d.addCallback(lambda e: bot.announce(e))
+        self.bot.announce("Time until the next update in the comic " + cmd) 
+        self.bot.announce(clock.timeUntilNextUpdate(self.comics[comic]))
