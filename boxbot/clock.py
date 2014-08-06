@@ -5,6 +5,11 @@
 a utility module for updatenotifier
 """
 
+
+import logging
+
+log = logging.getLogger(__name__)
+
 import datetime
 
 def findNextWeekDay(comic_schedule, currentUTCtime):
