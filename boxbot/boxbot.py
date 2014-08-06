@@ -133,7 +133,7 @@ class Bot(irc.IRCClient):
         self.urlfetcher(msg)
 
         def parseBotCmd(cmd):
-            return msg == self.nickname + ", " + cmd or msg == self.nickname + ": " + cmd
+            return msg.startswith(self.nickname + ", " + cmd) or msg.startswith(self.nickname + ": " + cmd)
         # A QUICK HACK:
         # proper command parser to be implemented
         if channel == self.factory.channel:
