@@ -50,7 +50,7 @@ def fetchTitle(url):
     to be in run in a thread.
     """
     try:
-        r = requests.head(url, timeout = 5.0)
+        r = requests.head(url, timeout = 5.0, allow_redirects = True)
         if 'text/html' in r.headers['content-type']:
             rd = requests.get(url)
             soup = BeautifulSoup(rd.text)
