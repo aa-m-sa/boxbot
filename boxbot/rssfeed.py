@@ -227,6 +227,8 @@ class Monitor:
         """ Receives the current topic in the feed"""
         log.debug("determining if topic should be updated")
         ircTopic = self._fetchIrcTopic()
+        log.debug("sees current topic as %s" % ircTopic.fullTitle)
+        log.debug("sees feedTopic as %s" % feedTopic.fullTitle)
         if feedTopic.isFresher(ircTopic):
             self._ircTopicUpdate(feedTopic)
 
