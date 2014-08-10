@@ -46,8 +46,17 @@ def prettify(timedelta):
         output += str(timedelta.days) + " days, "
     elif timedelta.days == 1:
         output += "1 day, "
-    m = timedelta.seconds // 60
-    output += str(m) + " minutes, " + str(timedelta.seconds - m*60) + " seconds"
+    h = timedelta.seconds // 60 // 60
+    if h > 1:
+        output += str(h) + " hours, "
+    elif h == 1:
+        output += "1 hour and "
+    m = (timedelta.seconds - 60*60*h) // 60
+    if m > 1:
+        output += str(m) + " minutes, "
+    if m == 1:
+        output += "1 minute, "
+    output += str(timedelta.seconds - 60*60*h - 60*m ) + " seconds"
     return output
 
 def timeUntilNextUpdate(comic_schedule):
