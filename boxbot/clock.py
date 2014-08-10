@@ -18,13 +18,15 @@ def findNextWeekDay(comic_schedule, currentUTCtime):
     for k in comic_schedule.keys():
         if k > 0 and k - d > 0 and k - d < cur_diff:
             cur_diff, cur = k - d, k
-        elif k == 0 and 7 - d > 0 and 7 - d < cur_diff:
-            cur_diff, cur = 7 - d, k
+        elif k < d and 7 + k - d > 0 and 7 + k - d < cur_diff:
+            cur_diff, cur = 7 + k - d, k
         elif k - d == 0:
             # the same day! clearly the min can't be less
             # but we should check if it's after or befor
             if currentUTCtime.time() < comic_schedule[k]:
                 return k
+    if cur == 7:
+        log.error("error in finding next weekday: cur was not set!")
     return cur
 
 def calculateDiff(currentUTCtime, next_day, schedule):
@@ -32,7 +34,7 @@ def calculateDiff(currentUTCtime, next_day, schedule):
     if next_day >= day:
         diff = datetime.timedelta(next_day - day)
     else:
-        diff = datetime.timedelta(day - next_day)
+        diff = datetime.timedelta(next_day + 7 - day)
 
     next_timedate = datetime.datetime.combine(currentUTCtime.date() + diff, 
             schedule[next_day])
