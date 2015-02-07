@@ -111,6 +111,10 @@ class Bot(irc.IRCClient):
         self.cachedTopic = newTopic
         # joined the channel and got a topic: start monitoring the feed
 
+    def blockForumUserPosts(self, userName, byWho, reason="Not specified"):
+        """Suppress notifying about forum posts made by userName"""
+        self.factory.feedMonitor.blockForumUser(userName, byWho, reason)
+
     def urlfetcher(self, msg):
 
         def titleAnnounce(titletext):
@@ -159,12 +163,30 @@ class Bot(irc.IRCClient):
             elif parseBotCmd("introduce yourself") or parseBotCmd("help"):
                 log.info("bot received an introduce command. proceeding...")
                 self.announce("HELLOOO")
-                self.announce("boxbot" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
-                self.announce("currently available commands: 'quit', 'update feed', 'set topic', 'stop (setting topic)', 'silence', 'unsilence', 'next update' ")
+                self.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
+                self.announce("important commands: quit, stop (setting topic), silence, block-forum-user (user)")
                 self.announce("contact maus if I'm too terrible and break something.")
             elif parseBotCmd("next update"):
                 log.info("bot asked to retrieve time until the next comic update")
                 self.factory.comicNotifier.askedNextUpdateWith(msg)
+            elif parseBotCmd("block-forum-user"):
+                log.info("blocking forum notifications from a user with a msg %s", msg)
+                blockParams = msg.split()
+                if len(blockParams) > 1:
+                    if len(blockParams) == 3:
+                        self.blockForumUserPosts(blockParams[1], user, blockParams[2])
+                    else:
+                        self.blockForumUserPosts(blockParams[1], user)
+            elif parseBotCmd("unblock-user"):
+                log.info("removing block")
+                blockParams = msg.split()
+                if len(blockParams) == 2:
+                    self.factory.feedMonitor.clearBlockedUser(blockParams[1])
+            elif parseBotCmd("tell-block-status"):
+                bparams = msg.split()
+                if len(blockParams) == 2:
+                    self.announce("Posts by " + bparams[1] + " blocked: " + self.factory.feedMonitor.isABlockedUser(bparams[1]))
+                    # I am doing this wrong. that long a method name should not be
             elif self.nickname in msg:
                 self.announceAww()
 

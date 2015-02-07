@@ -49,6 +49,7 @@ class Feed:
     recentComicEntry = None
     first = True
 
+
     def __init__(self, url):
         self.titlePat = re.compile(self.titleRe)
         self.postbyPat = re.compile(self.postbyRe)
@@ -144,6 +145,7 @@ class Monitor:
         self.isRunning = False
         self.bot = bot
         self.updatesTitle = updatesTitle
+        self.blockedForumUsers = {}
 
         # precompile regex for topicparser
         self.topicPat = re.compile(self.topicRe)
@@ -168,6 +170,25 @@ class Monitor:
         """Stop following the feed"""
         self.loopcall.stop()
         log.info("stopped following a feed")
+
+    def blockForumUser(self, user, byWho, reason):
+        """Add user to block list"""
+        log.info("blocked forum user: %s", user)
+        log.info("block by %s", byWho)
+        self.blockedForumUsers[user] = (byWho, reason);
+
+    def clearBlockedUser(self, user):
+        """Clea a blocked forum poster"""
+        try:
+            del self.blockedForumUsers[user]
+            log.info("removed user %s from blocklist", user)
+        except KeyError:
+            log.warning("can't remove user %s from blocklist", user)
+            pass
+
+    def isABlockedUser(self, user):
+        """nuff said"""
+        return user in self.blockedForumUsers
 
     def _fetchIrcTopic(self):
         """Get the current irc topic id status from the bot"""
@@ -234,7 +255,8 @@ class Monitor:
 
         log.debug("announcing threads with new posts")
         for t in updatedThreads:
-            self.bot.announce(t.postby + " posted to '" + t.title + "' " + t.recentlink)
+            if t.postby not in self.blockedForumUsers:
+                self.bot.announce(t.postby + " posted to '" + t.title + "' " + t.recentlink)
 
 
     def _ircTopicUpdate(self, feedTopic):
