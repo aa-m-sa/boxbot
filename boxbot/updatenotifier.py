@@ -21,7 +21,7 @@ import clock
 class Notifier(object):
 
     """Docstring for Notifier. """
-    
+
     bot = None
     comics = None   # a dictionary of update schedules
     default_comic = None
@@ -33,13 +33,13 @@ class Notifier(object):
         log.debug("a notifier instance created")
 
     def parseSchedule(self, schedule):
-        return {k: datetime.time(int(schedule[k][0]), int(schedule[k][1])) 
+        return {k: datetime.time(int(schedule[k][0]), int(schedule[k][1]))
                 for k in schedule}
 
     def parseConfig(self, notifyConfig):
-        comics = {comic: self.parseSchedule(notifyConfig['comics'][comic]) 
+        comics = {comic: self.parseSchedule(notifyConfig['comics'][comic])
                 for comic in notifyConfig['comics']}
-        return comics, notifyConfig['defaultComic'] 
+        return comics, notifyConfig['defaultComic']
 
     def parseMsg(self, msg):
         log.debug("parsing msg %s" % msg)
@@ -60,7 +60,7 @@ class Notifier(object):
     def handleCommandError(self, e):
         e.trap(Exception)
         log.error("next update command parsing error: %s" % e)
-    
+
     def handleCommand(self, cmd):
         log.debug("handling cmd: %s" % cmd)
         if not cmd:
@@ -73,7 +73,7 @@ class Notifier(object):
         else:
             log.debug("comic_name successfully retrieved from msg")
             comic = cmd
-        
+
         log.info("Announcing time until the next update")
-        self.bot.announce("Time until the next update in the comic " + cmd) 
+        self.bot.announce("Time until the next update in the comic " + cmd)
         self.bot.announce(clock.timeUntilNextUpdate(self.comics[comic]))
