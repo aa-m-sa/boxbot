@@ -186,6 +186,14 @@ class Monitor:
             log.warning("can't remove user %s from blocklist", user)
             pass
 
+    def blockedUserInfo(self, user):
+        """Details about blocked forum poster"""
+        try:
+            details = self.blockedForumUsers[user]
+            return details
+        except KeyError:
+            return None
+
     def isABlockedUser(self, user):
         """nuff said"""
         return user in self.blockedForumUsers

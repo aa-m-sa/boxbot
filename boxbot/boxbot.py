@@ -172,21 +172,25 @@ class Bot(irc.IRCClient):
             elif parseBotCmd("block-forum-user"):
                 log.info("blocking forum notifications from a user with a msg %s", msg)
                 blockParams = msg.split()
-                if len(blockParams) > 1:
-                    if len(blockParams) == 3:
-                        self.blockForumUserPosts(blockParams[1], user, blockParams[2])
+                if len(blockParams) > 2:
+                    if len(blockParams) == 4:
+                        self.blockForumUserPosts(blockParams[2], user, blockParams[3])
                     else:
-                        self.blockForumUserPosts(blockParams[1], user)
+                        self.blockForumUserPosts(blockParams[2], user)
             elif parseBotCmd("unblock-user"):
                 log.info("removing block")
                 blockParams = msg.split()
-                if len(blockParams) == 2:
-                    self.factory.feedMonitor.clearBlockedUser(blockParams[1])
+                if len(blockParams) == 3:
+                    self.announce("Removing filter on " + blockParams[2])
+                    self.factory.feedMonitor.clearBlockedUser(blockParams[2])
             elif parseBotCmd("tell-block-status"):
                 bparams = msg.split()
-                if len(blockParams) == 2:
-                    self.announce("Posts by " + bparams[1] + " blocked: " + self.factory.feedMonitor.isABlockedUser(bparams[1]))
-                    # I am doing this wrong. that long a method name should not be
+                if len(bparams) == 3:
+                    bstatus = self.factory.feedMonitor.isABlockedUser(bparams[2])
+                    self.announce("Posts by " + bparams[2] + " blocked: " + str(bstatus))
+                    if bstatus:
+                        details = self.factory.feedMonitor.blockedUserInfo(bparams[2])
+                        self.announce("Block by " + details[0] + " (" + details[1] + ")")
             elif self.nickname in msg:
                 self.announceAww()
 
