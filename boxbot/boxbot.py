@@ -23,6 +23,7 @@ import yaml
 import rssfeed
 import urltitle
 import updatenotifier
+import twitter
 
 # todo: features:
 # * a fully fledged command parser
@@ -274,6 +275,7 @@ class BotFactory(protocol.ReconnectingClientFactory):
         self.rssConfig = config['rss']
         self.quakeConfig = config['quakeAuth']
         self.notifyConfig = config['notifyComics']
+        self.twitterConfig = config['twitter']
         # pass the config to feed monitor
         log.debug("bot factory initilized")
 
@@ -299,6 +301,10 @@ class BotFactory(protocol.ReconnectingClientFactory):
         # start the comic update notifier clock thingy, and provide it a bot too:
         log.debug("creating a comic update time notifier")
         self.comicNotifier = updatenotifier.Notifier(self.notifyConfig, p)
+
+        log.debug("creating a twitter feed listener")
+        self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
+
         # reset reconnection delay
         self.resetDelay()
         return p

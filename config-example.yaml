@@ -16,6 +16,15 @@ nickname:  "yournick"
 realname:  "yourname"
 build:     "unstable dev build"
 
+twitter:
+        auth:
+            consumer_key:         twitterConsumerKey
+            consumer_secret:      twitterConsumerSecret
+            access_token:         twitterAccessToken
+            access_token_secret:  twitterAccessTokenSecret
+        follow:
+            - gunnerkrigg
+
 notifyComics:
         comics:
             Gunnerkrigg Court : {
