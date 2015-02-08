@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
+import tweepy
 
 import json
 
@@ -25,8 +26,12 @@ class IRCListener(StreamListener):
         self.auth = OAuthHandler(config["auth"]["consumer_key"], config["auth"]["consumer_secret"])
         self.auth.set_access_token(config["auth"]["access_token"], config["auth"]["access_token_secret"])
 
+        api = tweepy.API(self.auth)
+
         stream = Stream(self.auth, self)
-        stream.userstream(track=config["follow"], async=True)
+
+        users = [str(api.get_user(u).id) for u in config["follow"]]
+        stream.filter(follow=users, async=True)
 
         log.debug("a twitter.IRCListener instance created")
 
@@ -37,4 +42,4 @@ class IRCListener(StreamListener):
         return True
 
     def on_error(self, status):
-        log.debug("Twitter error: " + status)
+        log.debug("Twitter error: " + str(status))
