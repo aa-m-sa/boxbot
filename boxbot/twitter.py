@@ -30,15 +30,15 @@ class IRCListener(StreamListener):
 
         stream = Stream(self.auth, self)
 
-        users = [str(api.get_user(u).id) for u in config["follow"]]
-        stream.filter(follow=users, async=True)
+        self.users = [str(api.get_user(u).id) for u in config["follow"]]
+        stream.filter(follow=self.users, async=True)
 
         log.debug("a twitter.IRCListener instance created")
 
     def on_data(self, data):
         parsed = json.loads(data)
-        if "text" in parsed:
-            self.bot.announce(parsed["user"]["name"] + " tweeted \"" + parsed["text"] + "\"")
+        if "text" in parsed and parsed["user"]["id_str"] in self.users:
+            self.bot.announce(parsed["user"]["name"] + " tweeted \"" + parsed["text"] + "\" - https://twitter.com/" + parsed["user"]["screen_name"] + "/status/" + parsed["id_str"])
         return True
 
     def on_error(self, status):
