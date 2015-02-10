@@ -251,7 +251,6 @@ class Bot(irc.IRCClient):
                     log.debug("using special color")
                     log.debug(c)
                     toAssemble.append(c[m])
-                log.debug[toAssemble]
         return irc.assembleFormattedText(irc.attributes.normal[toAssemble])
 
     def announce(self, *msg, **kwargs):
@@ -274,7 +273,7 @@ class Bot(irc.IRCClient):
         # timer: actually announce the want only N times
         if self.doneWAnnounce <= self.maxWAnnounce:
             log.debug("announcement counter ok, making an announcement")
-            self.announce("wants to set topic to: " + topic)
+            self.announce("wants to set topic to ", topic, specialColors=(None, irc.attributes.fg.blue))
             self.doneWAnnounce += 1
 
     def setTopic(self, topic):
