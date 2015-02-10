@@ -228,17 +228,28 @@ class Bot(irc.IRCClient):
 
     def applyColorFormat(self, *msg, **kwargs):
         """put some nice colors on the message"""
-        colors = kwargs.get('colors', None)
+        colors = kwargs.get('colors')
         toAssemble = []
+        log.debug(msg)
+        log.debug(colors)
         if not colors or len(colors) != len(msg):
+            log.debug("no colors")
             for m in msg:
+                log.debug(m)
                 toAssemble.append(irc.attributes.fg.gray[m])
         else:
+            log.debug("colors!")
             for m, c in zip(msg, colors):
+                log.debug(m)
+                log.debug(c)
                 if not c:
+                    log.debug("no c")
                     toAssemble.append(irc.attributes.fg.gray[m])
                 else:
+                    log.debug("using special color")
+                    log.debug(c)
                     toAssemble.append(c[m])
+                log.debug[toAssemble]
         return irc.assembleFormattedText(irc.attributes.normal[toAssemble])
 
     def announce(self, *msg, **kwargs):
@@ -248,9 +259,9 @@ class Bot(irc.IRCClient):
         each part of the msg by providing a tuple of valid twisted irc
         attributes (or None for those parts where the default format should be
         applied)"""
-        specialColors = kwargs.get('specialColors', None)
+        specialColors = kwargs.get('specialColors')
         if self.announceAllowed:
-            colored = self.applyColorFormat(msg, colors=specialColors)
+            colored = self.applyColorFormat(*msg, colors=specialColors)
             self.say(self.factory.channel, colored.encode('utf-8'))
             log.info("bot announced: %s", msg)
         else:
