@@ -40,10 +40,10 @@ class IRCListener(StreamListener):
         parsed = json.loads(data)
         if "text" in parsed and parsed["user"]["id_str"] in self.users:
             # TODO: use Twisted color formatting
-            tweeter = parsed["user"]["name"]
-            tweet = parsed["text"]
+            ourtweeter = parsed["user"]["name"]
+            ourtweet = parsed["text"]
             statusLinkPart = "- https://twitter.com/" + parsed["user"]["screen_name"] + "/status/" + parsed["id_str"]
-            self.bot.announce(tweeter, " tweeted ", tweet, statusLinkPart, specialColors=(None, None, attributes.fg.blue, None))
+            self.bot.announce(ourtweeter, " tweeted ", ourtweet, statusLinkPart, specialColors=(None, None, attributes.fg.blue, None))
         return True
 
     def on_error(self, status):

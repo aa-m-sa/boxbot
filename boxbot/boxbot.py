@@ -232,10 +232,12 @@ class Bot(irc.IRCClient):
         toAssemble = []
         log.debug(msg)
         log.debug(colors)
+        msg = [m.encode('utf-8') for m in msg]
         if not colors or len(colors) != len(msg):
             log.debug("no colors")
             for m in msg:
                 log.debug(m)
+                log.debug(type(m))
                 toAssemble.append(irc.attributes.fg.gray[m])
         else:
             log.debug("colors!")
@@ -262,7 +264,7 @@ class Bot(irc.IRCClient):
         specialColors = kwargs.get('specialColors')
         if self.announceAllowed:
             colored = self.applyColorFormat(*msg, colors=specialColors)
-            self.say(self.factory.channel, colored.encode('utf-8'))
+            self.say(self.factory.channel, colored)
             log.info("bot announced: %s", msg)
         else:
             log.info("announce called but bot is silenced")
