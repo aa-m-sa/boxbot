@@ -42,7 +42,7 @@ class IRCListener(StreamListener):
             # TODO: use Twisted color formatting
             ourtweeter = parsed["user"]["name"]
             ourtweet = parsed["text"]
-            statusLinkPart = "- https://twitter.com/" + parsed["user"]["screen_name"] + "/status/" + parsed["id_str"]
+            statusLinkPart = " - https://twitter.com/" + parsed["user"]["screen_name"] + "/status/" + parsed["id_str"]
             self.bot.announce(ourtweeter, " tweeted ", ourtweet, statusLinkPart, specialColors=(None, None, attributes.fg.blue, None))
         return True
 
