@@ -226,14 +226,44 @@ class Bot(irc.IRCClient):
         self.factory.feedMonitor.stop()
         irc.IRCClient.quit(self, msg)
 
-    def colorFormat(self, msg):
+    def applyColorFormat(self, *msg, **kwargs):
         """put some nice colors on the message"""
-        return irc.assembleFormattedText(irc.attributes.normal[irc.attributes.fg.gray[msg]])
+        colors = kwargs.get('colors')
+        toAssemble = []
+        log.debug(msg)
+        log.debug(colors)
+        msg = [m.encode('utf-8') for m in msg]
+        if not colors or len(colors) != len(msg):
+            log.debug("no colors")
+            for m in msg:
+                log.debug(m)
+                log.debug(type(m))
+                toAssemble.append(irc.attributes.fg.gray[m])
+        else:
+            log.debug("colors!")
+            for m, c in zip(msg, colors):
+                log.debug(m)
+                log.debug(c)
+                if not c:
+                    log.debug("no c")
+                    toAssemble.append(irc.attributes.fg.gray[m])
+                else:
+                    log.debug("using special color")
+                    log.debug(c)
+                    toAssemble.append(c[m])
+        return irc.assembleFormattedText(irc.attributes.normal[toAssemble])
 
-    def announce(self, msg):
-        """Announce a message to channel"""
+    def announce(self, *msg, **kwargs):
+        """Announce a message (or a message consisting of multiple parts) to channel.
+
+        Optionally, one can specify special colors (or other irc effects) for
+        each part of the msg by providing a tuple of valid twisted irc
+        attributes (or None for those parts where the default format should be
+        applied)"""
+        specialColors = kwargs.get('specialColors')
         if self.announceAllowed:
-            self.say(self.factory.channel, self.colorFormat(msg.encode('utf-8')))
+            colored = self.applyColorFormat(*msg, colors=specialColors)
+            self.say(self.factory.channel, colored)
             log.info("bot announced: %s", msg)
         else:
             log.info("announce called but bot is silenced")
@@ -243,7 +273,7 @@ class Bot(irc.IRCClient):
         # timer: actually announce the want only N times
         if self.doneWAnnounce <= self.maxWAnnounce:
             log.debug("announcement counter ok, making an announcement")
-            self.announce("wants to set topic to: " + topic)
+            self.announce("wants to set topic to ", topic, specialColors=(None, irc.attributes.fg.blue))
             self.doneWAnnounce += 1
 
     def setTopic(self, topic):

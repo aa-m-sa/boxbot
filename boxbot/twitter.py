@@ -15,6 +15,7 @@ from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 import tweepy
+from twisted.words.protocols.irc import attributes
 
 import json
 
@@ -38,7 +39,11 @@ class IRCListener(StreamListener):
     def on_data(self, data):
         parsed = json.loads(data)
         if "text" in parsed and parsed["user"]["id_str"] in self.users:
-            self.bot.announce(parsed["user"]["name"] + " tweeted \"" + parsed["text"] + "\" - https://twitter.com/" + parsed["user"]["screen_name"] + "/status/" + parsed["id_str"])
+            # TODO: use Twisted color formatting
+            ourtweeter = parsed["user"]["name"]
+            ourtweet = parsed["text"]
+            statusLinkPart = " - https://twitter.com/" + parsed["user"]["screen_name"] + "/status/" + parsed["id_str"]
+            self.bot.announce(ourtweeter, " tweeted ", ourtweet, statusLinkPart, specialColors=(None, None, attributes.fg.blue, None))
         return True
 
     def on_error(self, status):
