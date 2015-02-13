@@ -65,6 +65,7 @@ class Feed:
         self._readThreadEntries()
         self._setCurrentTopic()
         self.first = False
+        log.debug("topic in the updated feed: %s", self.topic)
         return self.topic, self.updatedThreads
 
         # consider introducing more proper twisted style threading here?
