@@ -265,7 +265,7 @@ class Monitor:
         for t in updatedThreads:
             if t.postby not in self.blockedForumUsers:
                 self.bot.announce(t.postby + " posted to '" + t.title + "' " + t.recentlink)
-            else
+            else:
                 log.debug("filtering forum post by " + t.posty)
                 log.debug("filtered:" + self.blockedForumsUsers)
 
