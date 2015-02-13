@@ -165,12 +165,12 @@ class Bot(irc.IRCClient):
                 log.info("bot received an introduce command. proceeding...")
                 self.announce("HELLOOO")
                 self.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
-                self.announce("important commands: quit, stop (setting topic), silence, block-forum-user (user)")
+                self.announce("important commands: quit, stop (setting topic), silence, filter (posts by forum user) (reason)")
                 self.announce("contact maus if I'm too terrible and break something.")
             elif parseBotCmd("next update"):
                 log.info("bot asked to retrieve time until the next comic update")
                 self.factory.comicNotifier.askedNextUpdateWith(msg)
-            elif parseBotCmd("block-forum-user"):
+            elif parseBotCmd("filter"):
                 log.info("blocking forum notifications from a user with a msg %s", msg)
                 blockParams = msg.split()
                 if len(blockParams) > 2:
@@ -178,13 +178,13 @@ class Bot(irc.IRCClient):
                         self.blockForumUserPosts(blockParams[2], user, blockParams[3])
                     else:
                         self.blockForumUserPosts(blockParams[2], user)
-            elif parseBotCmd("unblock-user"):
+            elif parseBotCmd("remove-filter"):
                 log.info("removing block")
                 blockParams = msg.split()
                 if len(blockParams) == 3:
                     self.announce("Removing filter on " + blockParams[2])
                     self.factory.feedMonitor.clearBlockedUser(blockParams[2])
-            elif parseBotCmd("tell-block-status"):
+            elif parseBotCmd("filter-status"):
                 bparams = msg.split()
                 if len(bparams) == 3:
                     bstatus = self.factory.feedMonitor.isABlockedUser(bparams[2])
