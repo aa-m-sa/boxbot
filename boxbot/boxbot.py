@@ -184,7 +184,7 @@ class Bot(irc.IRCClient):
                 if len(blockParams) == 3:
                     self.announce("Removing filter on " + blockParams[2])
                     self.factory.feedMonitor.clearBlockedUser(blockParams[2])
-            elif parseBotCmd("filter-status"):
+            elif parseBotCmd("tell-filter-status"):
                 bparams = msg.split()
                 if len(bparams) == 3:
                     bstatus = self.factory.feedMonitor.isABlockedUser(bparams[2])
