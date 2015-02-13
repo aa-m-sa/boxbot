@@ -8,6 +8,7 @@ able to
 * Get authed with QuakeNet Q
 * Parse url titles (with Requests and BeautifulSoup)
 * Provide simple entertainment (Hellooo! Awww.) to channel patrons
+* Follow Twitter feeds
 
 ## usage ##
 
