@@ -16,7 +16,9 @@ This bot being heavily in development, you probably do not want to actually
 use this for anything.
 
 However, if you insist:
-Create a 'config.yaml' and 'config-test.yaml' files, see 
+* Branch `master` *should* be a stable version. It might also go on full rampage on your irc channel.
+* See `requirements.txt`, install packages if necessary.
+* Create a 'config.yaml' and 'config-test.yaml' files, see 
 'config-example.yaml' for syntax. Run by executing the script 'bin/boxbot'.
 
 ## license ##
@@ -26,7 +28,3 @@ a better irc bot by yourself, too. Please, do so.
 
 For completeness' sake, however, I declare this project GNU GPLv3. Search
 internet for terms.
-
-Naturally, other licenses may apply to libraries used (Twisted and feedparser
-are both MIT Licensed).
-
