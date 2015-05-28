@@ -12,6 +12,8 @@ import re
 
 from twisted.internet import task, reactor, threads
 
+from boxbot import command
+
 # todo:
 #  * use deferreds properly?
 #  * proper exceptions and error-handling
@@ -160,6 +162,17 @@ class Monitor:
         # we make rssCheck() a looping call
         self.loopcall = task.LoopingCall(self.rssCheck)
         log.debug("Monitor instance created")
+
+    # bot commands
+    @command(['refresh feeds','update feed'])
+    def forceFeedRefresh(self, cmdWords):
+        """Forces monitor to refresh all feeds.
+
+        Old slightly less descriptive 'update feed' keyword provided for legacy purposes
+        """
+        log.info("bot received an update command. calling rssCheck()...")
+        self.rssCheck()
+
 
     def start(self):
         """Get the bot and start following the feed"""
