@@ -332,8 +332,8 @@ class BotFactory(protocol.ReconnectingClientFactory):
         log.debug("creating a comic update time notifier")
         self.comicNotifier = updatenotifier.Notifier(self.notifyConfig, p)
 
-        #log.debug("creating a twitter feed listener")
-        #self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
+        log.debug("creating a twitter feed listener")
+        self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
 
         # reset reconnection delay
         self.resetDelay()
