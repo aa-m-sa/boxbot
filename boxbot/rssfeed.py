@@ -65,6 +65,7 @@ class Feed:
         self._readThreadEntries()
         self._setCurrentTopic()
         self.first = False
+        log.debug("topic in the updated feed: %s", self.topic)
         return self.topic, self.updatedThreads
 
         # consider introducing more proper twisted style threading here?
@@ -265,6 +266,9 @@ class Monitor:
         for t in updatedThreads:
             if t.postby not in self.blockedForumUsers:
                 self.bot.announce(t.postby + " posted to '" + t.title + "' " + t.recentlink)
+            else:
+                log.debug("filtering forum post by " + t.posty)
+                log.debug("filtered:" + self.blockedForumsUsers)
 
 
     def _ircTopicUpdate(self, feedTopic):
