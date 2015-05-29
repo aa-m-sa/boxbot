@@ -226,7 +226,7 @@ class Monitor:
         if self.isABlockedUser(blockedUser):
             blockInfo = self.blockedUserInfo(blockedUser)
             self.bot.announce("Posts filtered. Filter set by: "
-                    + str(blockInfo[0]) ", reason: " + str(blockInfo[1]))
+                    + str(blockInfo[0]) + ", reason: " + str(blockInfo[1]))
 
     # internals
     def start(self):
