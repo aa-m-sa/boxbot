@@ -19,7 +19,7 @@ def command(module, keywords):
     """Decorator that provides command interface for bot modules.
 
     Usage:
-        from boxbot import command
+        from command import command
         class ModuleMainClass():
             ...
 
