@@ -124,9 +124,6 @@ class Bot(irc.IRCClient):
         self.cachedTopic = newTopic
         # joined the channel and got a topic: start monitoring the feed
 
-    def blockForumUserPosts(self, userName, byWho, reason="Not specified"):
-        """Suppress notifying about forum posts made by userName"""
-        self.factory.feedMonitor.blockForumUser(userName, byWho, reason)
 
     def urlfetcher(self, msg):
 
@@ -165,7 +162,7 @@ class Bot(irc.IRCClient):
                     # maybe something more Twisted would more apt? meh
                     fun = command.allCommands[mod][key]
                     log.debug('Calling fun ' + str(fun))
-                    fun(self.regModules[mod], commandTokens[1:])
+                    fun(self.regModules[mod], commandTokens[1:], user=user, channel=channel, msg=msg)
                 else:
                     notValidCommand()
 
@@ -177,16 +174,6 @@ class Bot(irc.IRCClient):
         #    if parseBotCmd("quit"):
         #        log.info("bot received a quitting command")
         #        self.quit("Awww.")
-        #    elif parseBotCmd("update feed"):
-        #        log.info("bot received an update command. calling rssCheck()...")
-        #        self.factory.feedMonitor.rssCheck()
-        #    elif parseBotCmd("set topic"):
-        #        log.info("bot received a command to start setting topic")
-        #        self.factory.feedMonitor.updatesTitle = True
-        #        self.factory.feedMonitor.rssCheck()
-        #    elif parseBotCmd("stop setting topic") or parseBotCmd("stop"):
-        #        log.info("bot received a command to start setting topic")
-        #        self.factory.feedMonitor.updatesTitle = False
         #    elif parseBotCmd("silence"):
         #        log.info("silencing bot")
         #        self.announceAllowed = False
@@ -202,28 +189,6 @@ class Bot(irc.IRCClient):
         #    elif parseBotCmd("next update"):
         #        log.info("bot asked to retrieve time until the next comic update")
         #        self.factory.comicNotifier.askedNextUpdateWith(msg)
-        #    elif parseBotCmd("filter"):
-        #        log.info("blocking forum notifications from a user with a msg %s", msg)
-        #        blockParams = msg.split()
-        #        if len(blockParams) > 2:
-        #            if len(blockParams) == 4:
-        #                self.blockForumUserPosts(blockParams[2], user, blockParams[3])
-        #            else:
-        #                self.blockForumUserPosts(blockParams[2], user)
-        #    elif parseBotCmd("remove-filter"):
-        #        log.info("removing block")
-        #        blockParams = msg.split()
-        #        if len(blockParams) == 3:
-        #            self.announce("Removing filter on " + blockParams[2])
-        #            self.factory.feedMonitor.clearBlockedUser(blockParams[2])
-        #    elif parseBotCmd("tell-filter-status"):
-        #        bparams = msg.split()
-        #        if len(bparams) == 3:
-        #            bstatus = self.factory.feedMonitor.isABlockedUser(bparams[2])
-        #            self.announce("Posts by " + bparams[2] + " blocked: " + str(bstatus))
-        #            if bstatus:
-        #                details = self.factory.feedMonitor.blockedUserInfo(bparams[2])
-        #                self.announce("Block by " + details[0] + " (" + details[1] + ")")
         #    elif self.nickname in msg:
         #        self.announceAww()
 

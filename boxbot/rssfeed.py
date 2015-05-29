@@ -178,7 +178,57 @@ class Monitor:
         self.bot.announce('Checking rss feed!')
         self.rssCheck()
 
+    @command('rssfeed', ['update-topic'])
+    def updatingTopicOn(self, cmdTokens, **kwargs):
+        """Sets irc channel topic updating on."""
+        log.info("Topic updating on.")
+        self.updatesTitle = True
 
+    @command('rssfeed', ['stop-updating-topic'])
+    def updatingTopicOff(self, cmdTokens, **kwargs):
+        """Sets irc channel topic updating off."""
+        log.info("Topic updating off.")
+        self.updatesTitle = False
+
+    @command('rssfeed', ['filter-forum-user'])
+    def filterForumUser(self, cmdTokens, **kwargs):
+        """Suppress notifying about forum posts made by specified user.
+
+        Syntax: filter-forum-user <username> (<optional> <reason> ...)
+        """
+        blockedUser = cmdTokens[1]
+        reason = 'Not specified.'
+        if len(cmdTokens > 2):
+            reason = ' '.join(cmdTokens[2:])
+        byWho = kwargs['user']
+        log.info("blocked forum user: %s", blockedUser)
+        log.info("block by %s", byWho)
+        log.info("reason: %s", reason)
+        self.blockedForumUsers[blockedUser] = (byWho, reason);
+        self.bot.announce("Blocked!")
+
+    @command('rssfeed', ['remove-filter'])
+    def removeForumUserFilter(self, cmdTokens, **kwargs):
+        """Remove forum post filter on <username>."""
+
+        blockedUser = cmdTokens[1]
+        log.info("Removing block")
+        if self.isABlockedUser(blockedUser):
+            self.clearBlockedUser(blockedUser)
+            self.bot.announce("Filter removed!")
+        else:
+            self.bot.announce("No block in place!")
+
+    @command('rssfeed', ['tell-filter-status'])
+    def tellForumUserFilterStatus(self, cmdTokens, **kwargs):
+        """Tells filter status on <username>"""
+        blockedUser = cmdTokens[1]
+        if self.isABlockedUser(blockedUser):
+            blockInfo = self.blockedUserInfo(blockedUser)
+            self.bot.announce("Posts filtered. Filter set by: "
+                    + str(blockInfo[0]) ", reason: " + str(blockInfo[1]))
+
+    # internals
     def start(self):
         """Get the bot and start following the feed"""
         log.info("starting following a feed...")
@@ -190,11 +240,6 @@ class Monitor:
         self.loopcall.stop()
         log.info("stopped following a feed")
 
-    def blockForumUser(self, user, byWho, reason):
-        """Add user to block list"""
-        log.info("blocked forum user: %s", user)
-        log.info("block by %s", byWho)
-        self.blockedForumUsers[user] = (byWho, reason);
 
     def clearBlockedUser(self, user):
         """Clea a blocked forum poster"""
