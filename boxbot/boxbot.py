@@ -190,7 +190,7 @@ class Bot(irc.IRCClient):
             self.announce("You must provide me a valid command!")
 
         accepted = [self.nickname + d for d in self.commandDelimiters]
-        if msg.startswith(tuple(accepted)):
+        if channel == self.factory.channel and msg.startswith(tuple(accepted)):
             commandTokens = msg.split()
             if len(commandTokens) < 2:
                 notValidCommand()
@@ -207,17 +207,13 @@ class Bot(irc.IRCClient):
                     return
                 else:
                     notValidCommand()
+        elif self.nickname in msg:
+            self.announceAww()
 
-        #def parseBotCmd(cmd):
-        #    return msg.startswith(self.nickname + ", " + cmd) or msg.startswith(self.nickname + ": " + cmd)
-        # A QUICK HACK:
-        # proper command parser to be implemented
-        #if channel == self.factory.channel:
+        # TODO re-implement this using new command API
         #    elif parseBotCmd("next update"):
         #        log.info("bot asked to retrieve time until the next comic update")
         #        self.factory.comicNotifier.askedNextUpdateWith(msg)
-        #    elif self.nickname in msg:
-        #        self.announceAww()
 
     def action(self, user, channel, data):
         data = data.decode('utf-8')
@@ -358,8 +354,8 @@ class BotFactory(protocol.ReconnectingClientFactory):
         log.debug("creating a comic update time notifier")
         self.comicNotifier = updatenotifier.Notifier(self.notifyConfig, p)
 
-        #log.debug("creating a twitter feed listener")
-        #self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
+        log.debug("creating a twitter feed listener")
+        self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
 
         # reset reconnection delay
         self.resetDelay()
