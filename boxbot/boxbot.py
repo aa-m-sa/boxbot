@@ -73,7 +73,7 @@ class CoreCommands:
         for m in command.allCommands:
             s = "Module: " + m + "; commands: "
             s += ", ".join(command.allCommands[m].keys())
-        self.bot.announce(s)
+            self.bot.announce(s)
 
 
 class Bot(irc.IRCClient):
