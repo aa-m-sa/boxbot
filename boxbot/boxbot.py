@@ -72,7 +72,8 @@ class CoreCommands:
         log.info("bot asked to list commands")
         for m in command.allCommands:
             s = "Module: " + m + "; commands: "
-            s += ", ",join(command.allCommands[m].keys())
+            s += ", ".join(command.allCommands[m].keys())
+        self.bot.announce(s)
 
 
 class Bot(irc.IRCClient):
@@ -193,6 +194,7 @@ class Bot(irc.IRCClient):
             commandTokens = msg.split()
             if len(commandTokens) < 2:
                 notValidCommand()
+                return
             key = commandTokens[1]
             # stupid debug stuff
             log.debug('Trying to dechiper ' + key)
@@ -202,6 +204,7 @@ class Bot(irc.IRCClient):
                     fun = command.allCommands[mod][key]
                     log.debug('Calling fun ' + str(fun))
                     fun(self.regModules[mod], commandTokens[1:], user=user, channel=channel, msg=msg)
+                    return
                 else:
                     notValidCommand()
 
