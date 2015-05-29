@@ -63,7 +63,7 @@ class CoreCommands:
     def help(self, tokens, **kwargs):
         log.info("bot received an introduce command. proceeding...")
         self.bot.announce("HELLOOO")
-        self.bot.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
+        self.bot.announce("boxbot-" + self.bot.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
         self.bot.announce("You can get list of commands by calling me with 'list-commands'")
         self.bot.announce("contact maus if I'm too terrible and break something.")
 
