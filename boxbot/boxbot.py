@@ -161,7 +161,6 @@ class Bot(irc.IRCClient):
             # stupid debug stuff
             log.debug('Trying to dechiper ' + key)
             for mod in command.allCommands:
-                self.announce('Looking in ' + str(mod))
                 if key in command.allCommands[mod]:
                     # maybe something more Twisted would more apt? meh
                     fun = command.allCommands[mod][key]
