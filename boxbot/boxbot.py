@@ -36,6 +36,44 @@ import twitter
 # * separate bot (which takes commands and processes them) and protocol/client ?
 #   ...e.g. copy pyfibot and subclass Bot from BotCore/IrcProtocol
 
+class CoreCommands:
+    """Bot core commands"""
+    moduleName = "core"
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.bot.registerModule(self.moduleName, self)
+
+    @command.command("core", ['quit'])
+    def quit(self, tokens, **kwargs):
+        log.info("bot received a quitting command")
+        self.bot.quit("Awww.")
+
+    @command.command("core", ['silence'])
+    def silence(self, tokens, **kwargs):
+        log.info("silencing bot")
+        self.bot.announceAllowed = False
+
+    @command.command("core", ['unsilence'])
+    def unsilence(self, tokens, **kwargs):
+        log.info("unsilencing bot")
+        self.bot.announceAllowed = True
+
+    @command.command("core", ['help'])
+    def help(self, tokens, **kwargs):
+        log.info("bot received an introduce command. proceeding...")
+        self.bot.announce("HELLOOO")
+        self.bot.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
+        self.bot.announce("You can get list of commands by calling me with 'list-commands'")
+        self.bot.announce("contact maus if I'm too terrible and break something.")
+
+    @command.command("core", ['list-commands'])
+    def listCommands(self, tokens, **kwargs):
+        log.info("bot asked to list commands")
+        for m in command.allCommands:
+            s = "Module: " + m + "; commands: "
+            s += ", ",join(command.allCommands[m].keys())
+
 
 class Bot(irc.IRCClient):
     """A protocol object (our 'bot') for IRC'ing"""
@@ -65,6 +103,7 @@ class Bot(irc.IRCClient):
         self.factory = factory
         self.nickname = self.factory.config['nickname']
         self.realname = self.factory.config['realname']
+        self.commandCore = CoreCommands(self)
 
     def registerModule(self, module, instance):
         self.regModules[module] = instance
@@ -171,21 +210,6 @@ class Bot(irc.IRCClient):
         # A QUICK HACK:
         # proper command parser to be implemented
         #if channel == self.factory.channel:
-        #    if parseBotCmd("quit"):
-        #        log.info("bot received a quitting command")
-        #        self.quit("Awww.")
-        #    elif parseBotCmd("silence"):
-        #        log.info("silencing bot")
-        #        self.announceAllowed = False
-        #    elif parseBotCmd("unsilence"):
-        #        log.info("unsilencing bot")
-        #        self.announceAllowed = True
-        #    elif parseBotCmd("introduce yourself") or parseBotCmd("help"):
-        #        log.info("bot received an introduce command. proceeding...")
-        #        self.announce("HELLOOO")
-        #        self.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
-        #        self.announce("important commands: quit, stop (setting topic), silence, filter (posts by forum user) (reason)")
-        #        self.announce("contact maus if I'm too terrible and break something.")
         #    elif parseBotCmd("next update"):
         #        log.info("bot asked to retrieve time until the next comic update")
         #        self.factory.comicNotifier.askedNextUpdateWith(msg)
@@ -321,6 +345,8 @@ class BotFactory(protocol.ReconnectingClientFactory):
         # successfully connected, create the bot
         p = Bot(self)
         self.bot = p
+
+        # attach external modules:
         # start monitoring the feed with a Monitor;
         # provide it with a bot to manipulate
         log.debug("creating a feed monitor with a bot...")
