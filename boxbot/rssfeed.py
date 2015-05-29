@@ -12,7 +12,7 @@ import re
 
 from twisted.internet import task, reactor, threads
 
-from boxbot import command
+from command import command
 
 # todo:
 #  * use deferreds properly?
@@ -142,6 +142,8 @@ class Monitor:
 
     bot = None
 
+    moduleName = 'rssfeed'
+
     def __init__(self, rssConfig, bot, updatesTitle = True):
         self.feed = Feed(rssConfig['url'])
         self.delay = rssConfig['freq']
@@ -163,14 +165,17 @@ class Monitor:
         self.loopcall = task.LoopingCall(self.rssCheck)
         log.debug("Monitor instance created")
 
+        bot.registerModule(self.moduleName, self)
+
     # bot commands
-    @command(['refresh feeds','update feed'])
-    def forceFeedRefresh(self, cmdWords):
+    @command('rssfeed', ['refresh','update-feed'])
+    def forceFeedRefresh(self, cmdTokens, **kwargs):
         """Forces monitor to refresh all feeds.
 
-        Old slightly less descriptive 'update feed' keyword provided for legacy purposes
+        Slightly less descriptive 'update-feed' keyword provided for legacy purposes
         """
         log.info("bot received an update command. calling rssCheck()...")
+        self.bot.announce('Checking rss feed!')
         self.rssCheck()
 
 

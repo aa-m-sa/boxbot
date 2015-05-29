@@ -19,6 +19,9 @@ import sys
 import argparse
 import yaml
 
+# commands
+import command
+
 # custom modules
 import rssfeed
 import urltitle
@@ -32,6 +35,7 @@ import twitter
 # * proper error & exception handling for stability / hardness
 # * separate bot (which takes commands and processes them) and protocol/client ?
 #   ...e.g. copy pyfibot and subclass Bot from BotCore/IrcProtocol
+
 
 class Bot(irc.IRCClient):
     """A protocol object (our 'bot') for IRC'ing"""
@@ -51,11 +55,19 @@ class Bot(irc.IRCClient):
     maxAwws = 3
     cachedTopic = None
 
+    # command stuff; TODO move this elsewhere
+    commandDelimiters = [':', ',']
+
+    regModules = {}
+
+
     def __init__(self, factory):
         self.factory = factory
         self.nickname = self.factory.config['nickname']
         self.realname = self.factory.config['realname']
 
+    def registerModule(self, module, instance):
+        self.regModules[module] = instance
 
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
@@ -137,63 +149,84 @@ class Bot(irc.IRCClient):
 
         self.urlfetcher(msg)
 
-        def parseBotCmd(cmd):
-            return msg.startswith(self.nickname + ", " + cmd) or msg.startswith(self.nickname + ": " + cmd)
+        def notValidCommand():
+            self.announce("You must provide me a valid command!")
+
+        accepted = [self.nickname + d for d in self.commandDelimiters]
+        if msg.startswith(tuple(accepted)):
+            commandTokens = msg.split()
+            if len(commandTokens) < 2:
+                notValidCommand()
+            key = commandTokens[1]
+            # stupid debug stuff
+            log.debug('Trying to dechiper ' + key)
+            for mod in command.allCommands:
+                self.announce('Looking in ' + str(mod))
+                if key in command.allCommands[mod]:
+                    # maybe something more Twisted would more apt? meh
+                    fun = command.allCommands[mod][key]
+                    log.debug('Calling fun ' + str(fun))
+                    fun(self.regModules[mod], commandTokens[1:])
+                else:
+                    notValidCommand()
+
+        #def parseBotCmd(cmd):
+        #    return msg.startswith(self.nickname + ", " + cmd) or msg.startswith(self.nickname + ": " + cmd)
         # A QUICK HACK:
         # proper command parser to be implemented
-        if channel == self.factory.channel:
-            if parseBotCmd("quit"):
-                log.info("bot received a quitting command")
-                self.quit("Awww.")
-            elif parseBotCmd("update feed"):
-                log.info("bot received an update command. calling rssCheck()...")
-                self.factory.feedMonitor.rssCheck()
-            elif parseBotCmd("set topic"):
-                log.info("bot received a command to start setting topic")
-                self.factory.feedMonitor.updatesTitle = True
-                self.factory.feedMonitor.rssCheck()
-            elif parseBotCmd("stop setting topic") or parseBotCmd("stop"):
-                log.info("bot received a command to start setting topic")
-                self.factory.feedMonitor.updatesTitle = False
-            elif parseBotCmd("silence"):
-                log.info("silencing bot")
-                self.announceAllowed = False
-            elif parseBotCmd("unsilence"):
-                log.info("unsilencing bot")
-                self.announceAllowed = True
-            elif parseBotCmd("introduce yourself") or parseBotCmd("help"):
-                log.info("bot received an introduce command. proceeding...")
-                self.announce("HELLOOO")
-                self.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
-                self.announce("important commands: quit, stop (setting topic), silence, filter (posts by forum user) (reason)")
-                self.announce("contact maus if I'm too terrible and break something.")
-            elif parseBotCmd("next update"):
-                log.info("bot asked to retrieve time until the next comic update")
-                self.factory.comicNotifier.askedNextUpdateWith(msg)
-            elif parseBotCmd("filter"):
-                log.info("blocking forum notifications from a user with a msg %s", msg)
-                blockParams = msg.split()
-                if len(blockParams) > 2:
-                    if len(blockParams) == 4:
-                        self.blockForumUserPosts(blockParams[2], user, blockParams[3])
-                    else:
-                        self.blockForumUserPosts(blockParams[2], user)
-            elif parseBotCmd("remove-filter"):
-                log.info("removing block")
-                blockParams = msg.split()
-                if len(blockParams) == 3:
-                    self.announce("Removing filter on " + blockParams[2])
-                    self.factory.feedMonitor.clearBlockedUser(blockParams[2])
-            elif parseBotCmd("tell-filter-status"):
-                bparams = msg.split()
-                if len(bparams) == 3:
-                    bstatus = self.factory.feedMonitor.isABlockedUser(bparams[2])
-                    self.announce("Posts by " + bparams[2] + " blocked: " + str(bstatus))
-                    if bstatus:
-                        details = self.factory.feedMonitor.blockedUserInfo(bparams[2])
-                        self.announce("Block by " + details[0] + " (" + details[1] + ")")
-            elif self.nickname in msg:
-                self.announceAww()
+        #if channel == self.factory.channel:
+        #    if parseBotCmd("quit"):
+        #        log.info("bot received a quitting command")
+        #        self.quit("Awww.")
+        #    elif parseBotCmd("update feed"):
+        #        log.info("bot received an update command. calling rssCheck()...")
+        #        self.factory.feedMonitor.rssCheck()
+        #    elif parseBotCmd("set topic"):
+        #        log.info("bot received a command to start setting topic")
+        #        self.factory.feedMonitor.updatesTitle = True
+        #        self.factory.feedMonitor.rssCheck()
+        #    elif parseBotCmd("stop setting topic") or parseBotCmd("stop"):
+        #        log.info("bot received a command to start setting topic")
+        #        self.factory.feedMonitor.updatesTitle = False
+        #    elif parseBotCmd("silence"):
+        #        log.info("silencing bot")
+        #        self.announceAllowed = False
+        #    elif parseBotCmd("unsilence"):
+        #        log.info("unsilencing bot")
+        #        self.announceAllowed = True
+        #    elif parseBotCmd("introduce yourself") or parseBotCmd("help"):
+        #        log.info("bot received an introduce command. proceeding...")
+        #        self.announce("HELLOOO")
+        #        self.announce("boxbot-" + self.factory.config['build'] + ", command with 'boxbot: <commandstr>'")
+        #        self.announce("important commands: quit, stop (setting topic), silence, filter (posts by forum user) (reason)")
+        #        self.announce("contact maus if I'm too terrible and break something.")
+        #    elif parseBotCmd("next update"):
+        #        log.info("bot asked to retrieve time until the next comic update")
+        #        self.factory.comicNotifier.askedNextUpdateWith(msg)
+        #    elif parseBotCmd("filter"):
+        #        log.info("blocking forum notifications from a user with a msg %s", msg)
+        #        blockParams = msg.split()
+        #        if len(blockParams) > 2:
+        #            if len(blockParams) == 4:
+        #                self.blockForumUserPosts(blockParams[2], user, blockParams[3])
+        #            else:
+        #                self.blockForumUserPosts(blockParams[2], user)
+        #    elif parseBotCmd("remove-filter"):
+        #        log.info("removing block")
+        #        blockParams = msg.split()
+        #        if len(blockParams) == 3:
+        #            self.announce("Removing filter on " + blockParams[2])
+        #            self.factory.feedMonitor.clearBlockedUser(blockParams[2])
+        #    elif parseBotCmd("tell-filter-status"):
+        #        bparams = msg.split()
+        #        if len(bparams) == 3:
+        #            bstatus = self.factory.feedMonitor.isABlockedUser(bparams[2])
+        #            self.announce("Posts by " + bparams[2] + " blocked: " + str(bstatus))
+        #            if bstatus:
+        #                details = self.factory.feedMonitor.blockedUserInfo(bparams[2])
+        #                self.announce("Block by " + details[0] + " (" + details[1] + ")")
+        #    elif self.nickname in msg:
+        #        self.announceAww()
 
     def action(self, user, channel, data):
         data = data.decode('utf-8')
@@ -332,8 +365,8 @@ class BotFactory(protocol.ReconnectingClientFactory):
         log.debug("creating a comic update time notifier")
         self.comicNotifier = updatenotifier.Notifier(self.notifyConfig, p)
 
-        log.debug("creating a twitter feed listener")
-        self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
+        #log.debug("creating a twitter feed listener")
+        #self.tweetListener = twitter.IRCListener(self.twitterConfig, p)
 
         # reset reconnection delay
         self.resetDelay()
