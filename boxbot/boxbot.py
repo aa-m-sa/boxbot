@@ -205,8 +205,7 @@ class Bot(irc.IRCClient):
                     log.debug('Calling fun ' + str(fun))
                     fun(self.regModules[mod], commandTokens[1:], user=user, channel=channel, msg=msg)
                     return
-                else:
-                    notValidCommand()
+            notValidCommand()
         elif self.nickname in msg:
             self.announceAww()
 
@@ -245,6 +244,7 @@ class Bot(irc.IRCClient):
         log.info("stopping feedmonitor...")
         self.factory.feedMonitor.stop()
         irc.IRCClient.quit(self, msg)
+        sys.exit()
 
     def applyColorFormat(self, *msg, **kwargs):
         """put some nice colors on the message"""
